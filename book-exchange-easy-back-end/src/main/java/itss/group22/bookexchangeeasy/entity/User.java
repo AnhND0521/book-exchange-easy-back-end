@@ -1,14 +1,12 @@
 package itss.group22.bookexchangeeasy.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Table(name = "user")
 @Data
 @NoArgsConstructor
@@ -25,5 +23,7 @@ public class User {
 
     private String name;
 
+    @OneToOne
+    @JoinColumn(name = "contact_info_id")
     private ContactInfo contactInfo;
 }
