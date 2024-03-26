@@ -12,37 +12,28 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "book_post")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class BookPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String title;
+    private String content;
 
-    private String email;
-
-    private String password;
-
-    private String name;
-
-    @OneToOne
-    @JoinColumn(name = "contact_info_id")
-    private ContactInfo contactInfo;
-
-    private Boolean isVerified;
-
-    private Boolean isLocked;
+    @OneToMany(mappedBy = "post")
+    private Set<Book> books;
 
     @ManyToMany
     @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            name = "book_post_concerned_users",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<Role> roles;
+    private Set<User> concernedUsers;
 
     @CreationTimestamp
     private LocalDateTime created;
