@@ -34,9 +34,7 @@ public class Book {
     private String description;
     private String imageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "status")
-    private BookStatus status;
+    private Integer status;
 
     @ManyToOne
     @JoinColumn(name = "post_id")

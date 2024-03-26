@@ -7,14 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "book_status")
+@Table(name = "money_item")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookStatus {
+public class MoneyItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String value;
+
+    private Double amount;
+
+    private String unit;
 }
