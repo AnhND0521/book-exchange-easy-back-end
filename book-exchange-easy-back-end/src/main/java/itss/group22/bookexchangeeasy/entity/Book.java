@@ -29,14 +29,19 @@ public class Book {
     private String size;
     private Integer pages;
     private String layout;
+
+    @Column(name = "description", length = 1000)
     private String description;
     private String imageUrl;
+
     @ManyToOne
     @JoinColumn(name = "status")
     private BookStatus status;
+
     @ManyToOne
     @JoinColumn(name = "post_id")
     private BookPost post;
+
     @CreationTimestamp
     private LocalDateTime created;
 }
