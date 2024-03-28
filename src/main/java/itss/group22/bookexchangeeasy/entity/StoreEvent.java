@@ -8,41 +8,40 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
-@Table(name = "book")
+@Table(name = "store_event")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Book {
+public class StoreEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String author;
-    private String publisher;
-    private Integer publishYear;
-    private String language;
-    private String weight;
-    private String size;
-    private Integer pages;
-    private String layout;
-
-    @Column(name = "description", length = 1000)
-    private String description;
-    private String imagePath;
-
-    private Integer status;
-
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    private String name;
+
+    @Column(name = "description", length = 1000)
+    private String description;
+
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
     @CreationTimestamp
     private LocalDateTime created;
+
+    @ManyToMany
+    @JoinTable(
+            name = "event_concerned_users",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> concernedUsers;
 }

@@ -22,7 +22,13 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String title;
+
     private String content;
 
     private Boolean isBookPost;
@@ -40,6 +46,10 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> likedUsers;
+
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private StoreEvent event;
 
     @CreationTimestamp
     private LocalDateTime created;
