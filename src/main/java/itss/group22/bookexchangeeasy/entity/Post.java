@@ -9,31 +9,37 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "book_post")
+@Table(name = "post")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookPost {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
 
+    private Boolean isBookPost;
+
     @OneToMany(mappedBy = "post")
-    private Set<Book> books;
+    private List<Book> books;
+
+    @OneToMany(mappedBy = "post")
+    private List<Image> images;
 
     @ManyToMany
     @JoinTable(
-            name = "book_post_concerned_users",
+            name = "post_liked_users",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> concernedUsers;
+    private Set<User> likedUsers;
 
     @CreationTimestamp
     private LocalDateTime created;

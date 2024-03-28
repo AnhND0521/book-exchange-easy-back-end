@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -27,6 +28,14 @@ public class User {
     private String password;
 
     private String name;
+
+    private Integer gender;
+
+    private Integer birthYear;
+
+    private Integer birthMonth;
+
+    private Integer birthDate;
 
     @OneToOne
     @JoinColumn(name = "contact_info_id")

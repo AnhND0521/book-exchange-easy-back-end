@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -32,13 +31,13 @@ public class Book {
 
     @Column(name = "description", length = 1000)
     private String description;
-    private String imageUrl;
+    private String imagePath;
 
     private Integer status;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private BookPost post;
+    private Post post;
 
     @CreationTimestamp
     private LocalDateTime created;
