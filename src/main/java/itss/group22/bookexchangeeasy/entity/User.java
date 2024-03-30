@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.entity;
 
+import itss.group22.bookexchangeeasy.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,8 @@ public class User {
 
     private String name;
 
-    private Integer gender;
+    @Enumerated
+    private Gender gender;
 
     private Integer birthYear;
 

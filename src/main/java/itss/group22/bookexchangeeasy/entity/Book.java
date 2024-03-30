@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.entity;
 
+import itss.group22.bookexchangeeasy.enums.BookStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,8 @@ public class Book {
     private String description;
     private String imagePath;
 
-    private Integer status;
+    @Enumerated
+    private BookStatus status;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
