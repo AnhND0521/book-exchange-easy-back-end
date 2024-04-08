@@ -1,29 +1,30 @@
 package itss.group22.bookexchangeeasy.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "user")
+import java.util.Set;
+
+@Entity
+@Table(name = "address_unit")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class AddressUnit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
-
-    private String password;
-
     private String name;
 
-    private ContactInfo contactInfo;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private AddressUnit parent;
+
+    @OneToMany(mappedBy = "parent")
+    private Set<AddressUnit> children;
 }
