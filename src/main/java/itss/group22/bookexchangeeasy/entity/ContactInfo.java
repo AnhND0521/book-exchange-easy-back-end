@@ -19,15 +19,15 @@ public class ContactInfo {
 
     private String phoneNumber;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "province_id")
     private AddressUnit province;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "district_id")
     private AddressUnit district;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "commune_id")
     private AddressUnit commune;
 

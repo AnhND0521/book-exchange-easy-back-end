@@ -1,11 +1,8 @@
 package itss.group22.bookexchangeeasy.service.impl;
-
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
-import itss.group22.bookexchangeeasy.dto.AuthRequest;
-import itss.group22.bookexchangeeasy.dto.AuthResponse;
-import itss.group22.bookexchangeeasy.dto.RegisterRequest;
+import itss.group22.bookexchangeeasy.dto.*;
 import itss.group22.bookexchangeeasy.entity.AddressUnit;
 import itss.group22.bookexchangeeasy.entity.ContactInfo;
 import itss.group22.bookexchangeeasy.entity.Role;
@@ -130,4 +127,58 @@ public class UserServiceImpl implements UserService {
         var roles = user.getRoles().stream().map(Role::getName).toList();
         return String.join(" ", roles);
     }
+
+    @Override
+    public UserProfile getProfile(Long id) {
+       User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        UserProfile userProfile =   mapper.map(user, UserProfile.class);
+        userProfile.setRoles(user.getRoles().stream().map(Role::getName).toList());
+        userProfile.setProvince(AddressUnitDTO.builder()
+                .id(user.getContactInfo().getProvince().getId()).
+                name(user.getContactInfo().getProvince().getName()).build());
+        userProfile.setDistrict(AddressUnitDTO.builder()
+                .id(user.getContactInfo().getDistrict().getId()).
+                name(user.getContactInfo().getDistrict().getName()).build());
+        userProfile.setCommune(AddressUnitDTO.builder()
+                .id(user.getContactInfo().getCommune().getId()).
+                name(user.getContactInfo().getCommune().getName()).build());
+
+        userProfile.setDetailedAddress(user.getContactInfo().getDetailedAddress());
+        userProfile.setPhoneNumber(user.getContactInfo().getPhoneNumber());
+        return userProfile;
+        
+    }
+
+    @Override
+    public void updateProfile(Long id, UserProfile userProfile) {
+        User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        user.setRoles(userProfile.getRoles().stream().map(roleRepository::findByName).collect(Collectors.toSet()));
+        AddressUnit province = addressUnitRepository.findById(userProfile.getProvince().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Province", "id", userProfile.getProvince().getId()));
+        AddressUnit district = addressUnitRepository.findById(userProfile.getDistrict().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("District", "id", userProfile.getDistrict().getId()));
+        AddressUnit commune = addressUnitRepository.findById(userProfile.getCommune().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", userProfile.getCommune().getId()));
+
+        ContactInfo contactInfo = ContactInfo.builder()
+                .phoneNumber(userProfile.getPhoneNumber())
+                .province(province)
+                .district(district)
+                .commune(commune)
+                .detailedAddress(userProfile.getDetailedAddress())
+                .build();
+        user.setContactInfo(contactInfo);
+        user.setEmail(userProfile.getEmail());
+        user.setName(userProfile.getName());
+
+    }
+
+    @Override
+    public void changePassword(Long id, ChangePassDTO changePassDTO) {
+        User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        if (!passwordEncoder.matches(changePassDTO.getOldPassword(), user.getPassword()))
+            throw new ApiException("Incorrect password", HttpStatus.FORBIDDEN);
+        user.setPassword(passwordEncoder.encode(changePassDTO.getNewPassword()));
+    }
+
 }

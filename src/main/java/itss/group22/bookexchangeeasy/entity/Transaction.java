@@ -1,6 +1,7 @@
 package itss.group22.bookexchangeeasy.entity;
 
 import itss.group22.bookexchangeeasy.enums.ExchangeItemType;
+import itss.group22.bookexchangeeasy.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,11 +42,12 @@ public class Transaction {
 
     @OneToOne
     @JoinColumn(name = "book_item_id")
-    private Book bookItem;
+    private Book bookItem;  
 
     @OneToOne
     @JoinColumn(name = "money_item_id")
     private MoneyItem moneyItem;
-
-    private String status;
+    
+    @Enumerated
+    private TransactionStatus status;
 }

@@ -37,7 +37,7 @@ public class Book {
     @Enumerated
     private BookStatus status;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

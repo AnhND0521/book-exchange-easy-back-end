@@ -33,8 +33,8 @@ public class Post {
 
     private Boolean isBookPost;
 
-    @OneToMany(mappedBy = "post")
-    private List<Book> books;
+    @OneToOne(mappedBy = "post")
+    private Book book;
 
     @OneToMany(mappedBy = "post")
     private List<Image> images;

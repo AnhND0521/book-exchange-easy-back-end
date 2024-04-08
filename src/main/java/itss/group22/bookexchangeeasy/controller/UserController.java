@@ -1,17 +1,10 @@
 package itss.group22.bookexchangeeasy.controller;
-
-import itss.group22.bookexchangeeasy.dto.AuthRequest;
-import itss.group22.bookexchangeeasy.dto.AuthResponse;
-import itss.group22.bookexchangeeasy.dto.RegisterRequest;
-import itss.group22.bookexchangeeasy.dto.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.*;
 import itss.group22.bookexchangeeasy.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -29,5 +22,20 @@ public class UserController {
     private ResponseEntity<ResponseMessage> register(@RequestBody @Valid RegisterRequest registerRequest) {
         userService.register(registerRequest);
         return ResponseEntity.ok(new ResponseMessage("User account created successfully"));
+    }
+    @GetMapping("/{id}")
+    private ResponseEntity<UserProfile> getProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getProfile(id));
+    }
+    @PutMapping("/{id}")
+
+    private ResponseEntity<ResponseMessage> updateProfile(@PathVariable Long id, @RequestBody @Valid UserProfile userProfile) {
+        userService.updateProfile(id, userProfile);
+        return ResponseEntity.ok(new ResponseMessage("User profile updated successfully"));
+    }
+    @PutMapping("/{id}/change-password")
+    private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody ChangePassDTO changePassDTO) {
+        userService.changePassword(id, changePassDTO);
+        return ResponseEntity.ok(new ResponseMessage("Password changed successfully"));
     }
 }
