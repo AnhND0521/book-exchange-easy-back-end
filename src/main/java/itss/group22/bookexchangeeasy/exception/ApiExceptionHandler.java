@@ -22,7 +22,15 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorMessage> globalException(ApiException exception, WebRequest webRequest) {
+    public ResponseEntity<ErrorMessage> globalException(Exception exception, WebRequest webRequest) {
         return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> illegalArgumentException(IllegalArgumentException exception, WebRequest webRequest) {
+        System.out.println(exception.getMessage());
+        if (exception.getMessage().contains("No enum constant"))
+            return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
+        return globalException(exception, webRequest);
     }
 }

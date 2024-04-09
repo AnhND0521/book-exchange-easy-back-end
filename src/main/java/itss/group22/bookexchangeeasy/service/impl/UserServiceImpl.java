@@ -66,7 +66,9 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(registerRequest.getEmail()))
             throw new ApiException("Email already registered");
 
-        User user = mapper.map(registerRequest, User.class);
+        User user = new User();
+        user.setEmail(registerRequest.getEmail());
+        user.setName(registerRequest.getName());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setGender(Gender.valueOf(registerRequest.getGender()));
         user.setRoles(registerRequest.getRoles().stream().map(name ->
@@ -183,7 +185,7 @@ public class UserServiceImpl implements UserService {
     public void changePassword(Long id, ChangePasswordDTO changePasswordDTO) {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword()))
-            throw new ApiException("Incorrect password", HttpStatus.FORBIDDEN);
+            throw new ApiException("Incorrect password", HttpStatus.BAD_REQUEST);
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
     }
 

@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.controller;
+
 import itss.group22.bookexchangeeasy.dto.*;
 import itss.group22.bookexchangeeasy.service.UserService;
 import jakarta.validation.Valid;
@@ -23,16 +24,19 @@ public class UserController {
         userService.register(registerRequest);
         return ResponseEntity.ok(new ResponseMessage("User account created successfully"));
     }
+
     @GetMapping("/{id}")
     private ResponseEntity<UserProfile> getProfile(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getProfile(id));
     }
+
     @PutMapping("/{id}")
 
     private ResponseEntity<ResponseMessage> updateProfile(@PathVariable Long id, @RequestBody @Valid UserProfile userProfile) {
         userService.updateProfile(id, userProfile);
         return ResponseEntity.ok(new ResponseMessage("User profile updated successfully"));
     }
+
     @PutMapping("/{id}/change-password")
     private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody ChangePasswordDTO changePasswordDTO) {
         userService.changePassword(id, changePasswordDTO);
