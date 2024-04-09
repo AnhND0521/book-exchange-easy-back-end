@@ -34,8 +34,8 @@ public class UserController {
         return ResponseEntity.ok(new ResponseMessage("User profile updated successfully"));
     }
     @PutMapping("/{id}/change-password")
-    private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody ChangePassDTO changePassDTO) {
-        userService.changePassword(id, changePassDTO);
+    private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(id, changePasswordDTO);
         return ResponseEntity.ok(new ResponseMessage("Password changed successfully"));
     }
 }

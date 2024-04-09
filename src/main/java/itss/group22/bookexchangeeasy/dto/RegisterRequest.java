@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -25,14 +26,7 @@ public class RegisterRequest {
     @NotEmpty
     String gender;
 
-    @Min(1900)
-    Integer birthYear;
-
-    @Min(1) @Max(12)
-    Integer birthMonth;
-
-    @Min(1) @Max(31)
-    Integer birthDate;
+    LocalDate birthDate;
 
     @Pattern(regexp = "[0-9]{8,12}")
     String phoneNumber;

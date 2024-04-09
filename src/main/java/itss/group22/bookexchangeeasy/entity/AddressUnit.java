@@ -25,6 +25,8 @@ public class AddressUnit {
     @JoinColumn(name = "parent_id")
     private AddressUnit parent;
 
+    private Integer type;
+
     @OneToMany(mappedBy = "parent")
     private Set<AddressUnit> children;
 }

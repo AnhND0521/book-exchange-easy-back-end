@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -62,23 +63,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(RegisterRequest registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail()))
+            throw new ApiException("Email already registered");
+
         User user = mapper.map(registerRequest, User.class);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setGender(Gender.valueOf(registerRequest.getGender()));
-        user.setRoles(registerRequest.getRoles().stream()
-                .map(roleRepository::findByName)
-                .collect(Collectors.toSet()));
-        try {
-            var date = LocalDate.of(
-                    registerRequest.getBirthYear(),
-                    registerRequest.getBirthMonth(),
-                    registerRequest.getBirthDate()
-            );
-            if (date.isAfter(LocalDate.now()))
-                throw new DateTimeException("");
-        } catch (DateTimeException ex) {
+        user.setRoles(registerRequest.getRoles().stream().map(name ->
+                roleRepository.findByName(name)
+                        .orElseThrow(() -> new ResourceNotFoundException("role", "name", name))
+        ).collect(Collectors.toSet()));
+
+        if (registerRequest.getBirthDate().isAfter(LocalDate.now()))
             throw new ApiException("Invalid date of birth");
-        }
+        user.setBirthDate(registerRequest.getBirthDate());
 
         AddressUnit province = addressUnitRepository.findById(registerRequest.getProvinceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Province", "id", registerRequest.getProvinceId()));
@@ -130,8 +128,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfile getProfile(Long id) {
-       User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        UserProfile userProfile =   mapper.map(user, UserProfile.class);
+        User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        UserProfile userProfile = mapper.map(user, UserProfile.class);
+        userProfile.setGender(user.getGender().name());
         userProfile.setRoles(user.getRoles().stream().map(Role::getName).toList());
         userProfile.setProvince(AddressUnitDTO.builder()
                 .id(user.getContactInfo().getProvince().getId()).
@@ -146,20 +145,27 @@ public class UserServiceImpl implements UserService {
         userProfile.setDetailedAddress(user.getContactInfo().getDetailedAddress());
         userProfile.setPhoneNumber(user.getContactInfo().getPhoneNumber());
         return userProfile;
-        
     }
 
     @Override
     public void updateProfile(Long id, UserProfile userProfile) {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        user.setRoles(userProfile.getRoles().stream().map(roleRepository::findByName).collect(Collectors.toSet()));
+        user.setRoles(userProfile.getRoles().stream().map(name ->
+                roleRepository.findByName(name)
+                        .orElseThrow(() -> new ResourceNotFoundException("role", "name", name))
+        ).collect(Collectors.toSet()));
+        user.setGender(Gender.valueOf(userProfile.getGender()));
+
+        if (userProfile.getBirthDate().isAfter(LocalDate.now()))
+            throw new ApiException("Invalid date of birth");
+        user.setBirthDate(userProfile.getBirthDate());
+
         AddressUnit province = addressUnitRepository.findById(userProfile.getProvince().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Province", "id", userProfile.getProvince().getId()));
         AddressUnit district = addressUnitRepository.findById(userProfile.getDistrict().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("District", "id", userProfile.getDistrict().getId()));
         AddressUnit commune = addressUnitRepository.findById(userProfile.getCommune().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", userProfile.getCommune().getId()));
-
         ContactInfo contactInfo = ContactInfo.builder()
                 .phoneNumber(userProfile.getPhoneNumber())
                 .province(province)
@@ -174,11 +180,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(Long id, ChangePassDTO changePassDTO) {
+    public void changePassword(Long id, ChangePasswordDTO changePasswordDTO) {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        if (!passwordEncoder.matches(changePassDTO.getOldPassword(), user.getPassword()))
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword()))
             throw new ApiException("Incorrect password", HttpStatus.FORBIDDEN);
-        user.setPassword(passwordEncoder.encode(changePassDTO.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
     }
 
 }

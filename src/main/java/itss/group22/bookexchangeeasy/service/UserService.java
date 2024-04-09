@@ -7,5 +7,5 @@ public interface UserService {
     void register(RegisterRequest registerRequest);
     UserProfile getProfile(Long id);
     void updateProfile(Long id, UserProfile userProfile);
-    void changePassword(Long id, ChangePassDTO changePassDTO);
+    void changePassword(Long id, ChangePasswordDTO changePasswordDTO);
 }
