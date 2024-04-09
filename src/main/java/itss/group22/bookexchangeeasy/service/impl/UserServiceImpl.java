@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) {
         User user = userRepository.findByEmail(authRequest.getEmail())
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new ApiException("Account does not exist", HttpStatus.FORBIDDEN));
         log.info("Found user: " + user.getEmail());
 
         if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
@@ -175,10 +175,12 @@ public class UserServiceImpl implements UserService {
                 .commune(commune)
                 .detailedAddress(userProfile.getDetailedAddress())
                 .build();
+        contactInfoRepository.save(contactInfo);
+
         user.setContactInfo(contactInfo);
         user.setEmail(userProfile.getEmail());
         user.setName(userProfile.getName());
-
+        userRepository.save(user);
     }
 
     @Override
@@ -187,6 +189,7 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword()))
             throw new ApiException("Incorrect password", HttpStatus.BAD_REQUEST);
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+        userRepository.save(user);
     }
 
 }

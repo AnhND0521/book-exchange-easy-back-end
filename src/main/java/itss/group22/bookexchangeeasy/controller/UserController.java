@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/change-password")
-    private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody ChangePasswordDTO changePasswordDTO) {
+    private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
         userService.changePassword(id, changePasswordDTO);
         return ResponseEntity.ok(new ResponseMessage("Password changed successfully"));
     }
