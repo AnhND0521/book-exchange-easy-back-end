@@ -26,8 +26,8 @@ public class PostDTO {
     private Boolean isBookPost;
     private BookDTO book;
     private List<ImageDTO> images;
-    private Set<String> likedUserIds;
-    private String eventId;
+    private Set<Long> likedUserIds;
+    private Long eventId;
     private LocalDateTime created;
     private LocalDateTime lastUpdated;
 }

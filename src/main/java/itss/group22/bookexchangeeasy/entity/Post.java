@@ -33,7 +33,7 @@ public class Post {
 
     private Boolean isBookPost;
 
-    @OneToOne(mappedBy = "post")
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
     private Book book;
 
     @OneToMany(mappedBy = "post")
