@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
+
 import itss.group22.bookexchangeeasy.dto.BookDTO;
 import itss.group22.bookexchangeeasy.dto.PostDTO;
 import itss.group22.bookexchangeeasy.entity.Book;
@@ -31,6 +32,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final PostRepository postRepository;
     private final ModelMapper mapper;
+
     @Override
     public void postBook(Long userId, PostDTO postDTO) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -39,7 +41,7 @@ public class BookServiceImpl implements BookService {
         post.setIsBookPost(true);
         Set<User> likedUsers = postDTO.getLikedUserIds().stream().map(id -> userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id))).collect(Collectors.toSet());
         post.setLikedUsers(likedUsers);
-        StoreEvent  storeEvent  = storeEventRepository.findById(postDTO.getEventId()).orElseThrow(() -> new ResourceNotFoundException("StoreEvent", "id", postDTO.getEventId()));
+        StoreEvent storeEvent = storeEventRepository.findById(postDTO.getEventId()).orElseThrow(() -> new ResourceNotFoundException("StoreEvent", "id", postDTO.getEventId()));
         post.setEvent(storeEvent);
         Book book = mapper.map(postDTO.getBook(), Book.class);
         BookStatus bookStatus = BookStatus.valueOf(postDTO.getBook().getStatus());
@@ -76,19 +78,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<PostDTO> getAllBooks(int page, int size){
+    public List<PostDTO> getAllBooks(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Post> posts = postRepository.getAllPost(BookStatus.AVAILABLE, pageable);
 
         return posts.stream().map(post -> {
-           PostDTO postDTO =  mapper.map(post, PostDTO.class);
-           postDTO.setUserId(post.getUser().getId());
-              postDTO.setLikedUserIds(post.getLikedUsers().stream().map(User::getId).collect(Collectors.toSet()));
-                postDTO.setEventId(post.getEvent().getId());
-                BookDTO bookDTO = mapper.map(post.getBook(), BookDTO.class);
-                bookDTO.setStatus(post.getBook().getStatus().name());
+            PostDTO postDTO = mapper.map(post, PostDTO.class);
+            postDTO.setUserId(post.getUser().getId());
+            postDTO.setLikedUserIds(post.getLikedUsers().stream().map(User::getId).collect(Collectors.toSet()));
+            postDTO.setEventId(post.getEvent().getId());
+            BookDTO bookDTO = mapper.map(post.getBook(), BookDTO.class);
+            bookDTO.setStatus(post.getBook().getStatus().name());
 
-              postDTO.setBook(bookDTO);
+            postDTO.setBook(bookDTO);
             return postDTO;
         }).collect(Collectors.toList());
 

@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    container_name: mysqldb
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: book_exchange_easy_db
+    networks:
+      springboot-mysql-network:
+    volumes:
+      - db-data:/var/lib/mysql
+
+  book-exchange-easy-back-end:
+    container_name: book-exchange-easy-back-end
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: book-exchange-easy-back-end:latest
+    ports:
+      - "8080:8080"
+    networks:
+      springboot-mysql-network:
+    restart: on-failure
+
+networks:
+  springboot-mysql-network:
+
+volumes:
+  db-data:
