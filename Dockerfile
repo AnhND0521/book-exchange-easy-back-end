@@ -1,7 +1,13 @@
-FROM maven:3.9.6-eclipse-temurin-17
+FROM openjdk:17-alpine
+
+RUN apk add --no-cache maven
 
 WORKDIR /app
 
-COPY target/book-exchange-easy-0.0.1-SNAPSHOT.jar /app/book-exchange-easy.jar
+COPY . /app
 
-ENTRYPOINT ["java", "-jar", "book-exchange-easy.jar"]
+RUN mvn clean package -DskipTests
+
+WORKDIR /app/target
+
+CMD ["java", "-jar", "book-exchange-easy-0.0.1-SNAPSHOT.jar"]
