@@ -31,13 +31,15 @@ public class Post {
 
     private String content;
 
-    private Boolean isBookPost;
+//    private Boolean isBookPost;
+//
+//    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+//    private Book book;
+//
+//    @OneToMany(mappedBy = "post")
+//    private List<Image> images;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
-    private Book book;
-
-    @OneToMany(mappedBy = "post")
-    private List<Image> images;
+    private String imageUrl;
 
     @ManyToMany
     @JoinTable(

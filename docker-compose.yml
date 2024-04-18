@@ -14,9 +14,9 @@ services:
 
   book-exchange-easy-back-end:
     container_name: book-exchange-easy-back-end
-    build:
-      context: .
-      dockerfile: Dockerfile
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
     image: book-exchange-easy-back-end:latest
     ports:
       - "8080:8080"

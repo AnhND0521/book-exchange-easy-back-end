@@ -31,8 +31,8 @@ public class RegisterRequest {
     @Pattern(regexp = "[0-9]{8,12}")
     String phoneNumber;
 
-    Long provinceId;
-    Long districtId;
-    Long communeId;
+    String provinceId;
+    String districtId;
+    String communeId;
     String detailedAddress;
 }

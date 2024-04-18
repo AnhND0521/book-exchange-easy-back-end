@@ -16,8 +16,9 @@ import java.util.Set;
 @Builder
 public class AddressUnit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", length = 20)
+    private String id;
 
     private String name;
 

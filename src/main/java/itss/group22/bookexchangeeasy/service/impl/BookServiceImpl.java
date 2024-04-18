@@ -38,7 +38,7 @@ public class BookServiceImpl implements BookService {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Post post = mapper.map(postDTO, Post.class);
         post.setUser(user);
-        post.setIsBookPost(true);
+//        post.setIsBookPost(true);
         Set<User> likedUsers = postDTO.getLikedUserIds().stream().map(id -> userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id))).collect(Collectors.toSet());
         post.setLikedUsers(likedUsers);
         StoreEvent storeEvent = storeEventRepository.findById(postDTO.getEventId()).orElseThrow(() -> new ResourceNotFoundException("StoreEvent", "id", postDTO.getEventId()));
@@ -47,8 +47,8 @@ public class BookServiceImpl implements BookService {
         BookStatus bookStatus = BookStatus.valueOf(postDTO.getBook().getStatus());
         book.setStatus(bookStatus);
         book.setOwner(user);
-        post.setBook(book);
-        book.setPost(post);
+//        post.setBook(book);
+//        book.setPost(post);
         bookRepository.save(book);
     }
 
@@ -62,7 +62,7 @@ public class BookServiceImpl implements BookService {
         Book book1 = mapper.map(bookDTO, Book.class);
         book1.setId(bookId);
         book1.setOwner(user);
-        book1.setPost(book.getPost());
+//        book1.setPost(book.getPost());
         book1.setStatus(BookStatus.valueOf(bookDTO.getStatus()));
         bookRepository.save(book1);
     }
@@ -80,20 +80,20 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<PostDTO> getAllBooks(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Post> posts = postRepository.getAllPost(BookStatus.AVAILABLE, pageable);
-
-        return posts.stream().map(post -> {
-            PostDTO postDTO = mapper.map(post, PostDTO.class);
-            postDTO.setUserId(post.getUser().getId());
-            postDTO.setLikedUserIds(post.getLikedUsers().stream().map(User::getId).collect(Collectors.toSet()));
-            postDTO.setEventId(post.getEvent().getId());
-            BookDTO bookDTO = mapper.map(post.getBook(), BookDTO.class);
-            bookDTO.setStatus(post.getBook().getStatus().name());
-
-            postDTO.setBook(bookDTO);
-            return postDTO;
-        }).collect(Collectors.toList());
-
+//        List<Post> posts = postRepository.getAllPost(BookStatus.AVAILABLE, pageable);
+//
+//        return posts.stream().map(post -> {
+//            PostDTO postDTO = mapper.map(post, PostDTO.class);
+//            postDTO.setUserId(post.getUser().getId());
+//            postDTO.setLikedUserIds(post.getLikedUsers().stream().map(User::getId).collect(Collectors.toSet()));
+//            postDTO.setEventId(post.getEvent().getId());
+//            BookDTO bookDTO = mapper.map(post.getBook(), BookDTO.class);
+//            bookDTO.setStatus(post.getBook().getStatus().name());
+//
+//            postDTO.setBook(bookDTO);
+//            return postDTO;
+//        }).collect(Collectors.toList());
+        return null;
     }
 
 }

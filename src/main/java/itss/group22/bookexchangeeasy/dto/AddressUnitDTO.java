@@ -8,6 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class AddressUnitDTO {
-    private Long id;
+    private String id;
     private String name;
 }
