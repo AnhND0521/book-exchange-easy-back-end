@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 @DataJpaTest
-public class BookRepositoryTests {
+public class BookRepositoryTest {
     @Autowired
     private BookRepository bookRepository;
 

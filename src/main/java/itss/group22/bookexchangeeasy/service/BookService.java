@@ -1,7 +1,6 @@
 package itss.group22.bookexchangeeasy.service;
 
 import itss.group22.bookexchangeeasy.dto.BookDTO;
-import itss.group22.bookexchangeeasy.dto.PostDTO;
 
 import java.util.List;
 
