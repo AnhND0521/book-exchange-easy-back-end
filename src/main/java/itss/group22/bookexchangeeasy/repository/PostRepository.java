@@ -9,11 +9,5 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-
-//    @Query("SELECT p FROM Post p "
-//            + "JOIN p.book b "
-//            + "WHERE b.status = ?1 "
-//            + "ORDER BY p.created DESC")
-//    List<Post> getAllPost(BookStatus status, Pageable pageable);
 }
 

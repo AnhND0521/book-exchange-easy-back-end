@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user_info")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

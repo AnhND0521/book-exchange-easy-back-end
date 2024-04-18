@@ -135,12 +135,12 @@ LOCK TABLES `transaction` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `user`
+-- Dumping data for table `user_info`
 --
 
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+LOCK TABLES `user_info` WRITE;
+/*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -161,4 +161,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-18 11:59:15
+-- Dump completed on 2024-04-18 16:03:34
