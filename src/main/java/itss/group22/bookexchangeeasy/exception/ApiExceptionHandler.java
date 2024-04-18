@@ -24,19 +24,19 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<ErrorMessage> illegalArgumentException(IllegalArgumentException exception, WebRequest webRequest) {
-//        if (exception.getMessage().contains("No enum constant"))
-//            return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
-//        return globalException(exception, webRequest);
-//    }
-//
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ErrorMessage> methodArgumentNotValidException(MethodArgumentNotValidException exception, WebRequest webRequest) {
-//        if (exception.getMessage().contains("Validation failed"))
-//            return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
-//        return globalException(exception, webRequest);
-//    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> illegalArgumentException(IllegalArgumentException exception, WebRequest webRequest) {
+        if (exception.getMessage().contains("No enum constant"))
+            return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
+        return globalException(exception, webRequest);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorMessage> methodArgumentNotValidException(MethodArgumentNotValidException exception, WebRequest webRequest) {
+        if (exception.getMessage().contains("Validation failed"))
+            return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
+        return globalException(exception, webRequest);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorMessage> globalException(Exception exception, WebRequest webRequest) {

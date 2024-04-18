@@ -1,15 +1,8 @@
 package itss.group22.bookexchangeeasy.dto;
 
-import itss.group22.bookexchangeeasy.entity.Book;
-import itss.group22.bookexchangeeasy.entity.Image;
-import itss.group22.bookexchangeeasy.entity.StoreEvent;
-import itss.group22.bookexchangeeasy.entity.User;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;

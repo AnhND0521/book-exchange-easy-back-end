@@ -39,7 +39,7 @@ public class Post {
 //    @OneToMany(mappedBy = "post")
 //    private List<Image> images;
 
-    private String imageUrl;
+    private String imagePath;
 
     @ManyToMany
     @JoinTable(
