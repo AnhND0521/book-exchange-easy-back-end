@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<h1>Login</h1>
+<form>
+    <label>Email</label>
+    <input id="email" name="email" type="text">
+    <br><br>
+    <label>Password</label>
+    <input id="password" name="password" type="password">
+    <br><br>
+    <button id="login-btn">Login</button>
+    <br><br>
+    <p id="message"></p>
+</form>
+
+<script>
+    const apiUrl = "http://localhost:8080/api/v1";
+    $("#login-btn").click((event) => {
+        event.preventDefault();
+        $.ajax({
+            url: `${apiUrl}/users/auth`,
+            type: "POST",
+            data: JSON.stringify({
+                email: $("#email").val(),
+                password: $("#password").val()
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            success: (data) => {
+                console.log(data);
+                $("#message").text(`Token: ${data.accessToken}`);
+                expires = new Date();
+                expires.setTime(expires.getTime() + 24*60*60*1000);
+                document.cookie = `access_token=${data.accessToken}; expires=${expires.toUTCString()}`;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseJSON) {
+                    const errorMessage = jqXHR.responseJSON.message; // Assuming "message" property holds the error message
+                    $("#message").text(`Error: ${errorMessage}`);
+                } else {
+                    // Handle cases where no error data is available from the server
+                    $("#message").text("An unexpected error occurred.");
+                }    
+            }
+        })
+    });
+
+
+</script>
+
+</body>
+</html>

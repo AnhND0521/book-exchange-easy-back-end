@@ -1,9 +1,6 @@
 package itss.group22.bookexchangeeasy.repository;
 
 import itss.group22.bookexchangeeasy.entity.Book;
-
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +13,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Random;
 import java.util.stream.IntStream;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
 public class BookRepositoryTest {

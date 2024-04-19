@@ -46,8 +46,9 @@ class BookServiceTest {
                 .description("This is the description")
                 .build();
 
+        Long ownerId = 1L;
         User user = User.builder()
-                .id(1L)
+                .id(ownerId)
                 .email("test@gmail.com")
                 .name("Test User")
                 .gender(Gender.MALE)
@@ -62,7 +63,7 @@ class BookServiceTest {
                 .status(BookStatus.AVAILABLE)
                 .build();
 
-        when(userRepository.findById(1L))
+        when(userRepository.findById(ownerId))
                 .thenReturn(Optional.of(user));
 
         when(bookRepository.save(any(Book.class)))
@@ -77,12 +78,12 @@ class BookServiceTest {
         assertThat(capturedBook.getName()).isEqualTo("Book name");
         assertThat(capturedBook.getAuthor()).isEqualTo("Author X");
         assertThat(capturedBook.getStatus()).isEqualTo(BookStatus.AVAILABLE);
-        assertThat(capturedBook.getOwner().getId()).isEqualTo(1L);
+        assertThat(capturedBook.getOwner().getId()).isEqualTo(ownerId);
         assertThat(capturedBook.getOwner().getEmail()).isEqualTo("test@gmail.com");
         assertThat(capturedBook.getOwner().getName()).isEqualTo("Test User");
 
         assertThat(returned.getId()).isNotNull();
-        assertThat(returned.getOwnerId()).isEqualTo(1L);
+        assertThat(returned.getOwnerId()).isEqualTo(ownerId);
         assertThat(returned.getName()).isEqualTo("Book name");
         assertThat(returned.getAuthor()).isEqualTo("Author X");
         assertThat(returned.getStatus()).isEqualTo("AVAILABLE");
