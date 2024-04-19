@@ -17,7 +17,7 @@ services:
 #    build:
 #      context: .
 #      dockerfile: Dockerfile
-    image: book-exchange-easy-back-end:latest
+    image: nda2105/book-exchange-easy-back-end:latest
     ports:
       - "8080:8080"
     networks:

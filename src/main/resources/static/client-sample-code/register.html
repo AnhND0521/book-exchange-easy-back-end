@@ -113,7 +113,7 @@
                             $("#commune").empty();
                             $("#commune").append($(`<option value=\"\" selected></option>`));
 
-                            // load districts
+                            // load communes
                             $.ajax({
                                 url: `${apiUrl}/address/communes?district-id=${$("#district").val()}`,
                                 type: "GET",

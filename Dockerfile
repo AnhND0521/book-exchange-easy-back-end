@@ -1,13 +1,7 @@
 FROM openjdk:17-alpine
 
-RUN apk add --no-cache maven
-
 WORKDIR /app
 
-COPY . /app
+COPY target/book-exchange-easy-0.0.1-SNAPSHOT.jar /app/book-exchange-easy.jar
 
-RUN mvn clean package -DskipTests
-
-WORKDIR /app/target
-
-CMD ["java", "-jar", "book-exchange-easy-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "book-exchange-easy.jar"]
