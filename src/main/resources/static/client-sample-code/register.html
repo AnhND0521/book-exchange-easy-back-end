@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<h1>Register</h1>
+<form>
+    <label>Email *</label>
+    <input id="email" name="email" type="text" required>
+    <br><br>
+    <label>Password *</label>
+    <input id="password" name="password" type="password" required>
+    <br><br>
+
+    <label>Role *</label>
+    <input type="radio" id="role_exchanger" name="role" value="BOOK_EXCHANGER" required>
+    <label for="role_exchanger">Book exchanger</label>
+    <input type="radio" id="role_bookstore" name="role" value="BOOKSTORE" required>
+    <label for="role_bookstore">Book store</label>
+
+    <br><br>
+
+    <label>Name *</label>
+    <input id="name" name="name" type="text" required>
+    <br><br>
+
+    <label>Gender *</label>
+    <input type="radio" id="gender_male" name="gender" value="MALE" required>
+    <label for="gender_male">Male</label>
+    <input type="radio" id="gender_female" name="gender" value="FEMALE" required>
+    <label for="gender_female">Female</label>
+    <input type="radio" id="gender_other" name="gender" value="OTHER" required>
+    <label for="gender_other">Other</label>
+
+    <br><br>
+
+    <label>Birth date *</label>
+    <input type="date" id="birth-date" name="birthDate" required>
+
+    <br><br>
+
+    <label>Phone number</label>
+    <input id="phone-number" name="phoneNumber" type="text" pattern="[0-9]{8,12}">
+
+    <br><br>
+
+    <label>City / province</label>
+    <select id="province" name="province">
+    </select>
+
+    <br><br>
+
+    <label>District</label>
+    <select id="district" name="district">
+    </select>
+
+    <br><br>
+
+    <label>Ward / commune</label>
+    <select id="commune" name="commune">
+    </select>
+
+    <br><br>
+
+    <label>Detailed address</label>
+    <input id="detailed-address" name="detailedAddress" type="text">
+    <br><br>
+
+    <button id="register-btn">Register</button>
+    <br><br>
+    <p id="message"></p>
+</form>
+
+<script>
+    const apiUrl = "http://localhost:8080/api/v1";
+    
+    $("#province").append($(`<option value=\"\" selected></option>`));
+
+    // load provinces
+    $.ajax({
+        url: `${apiUrl}/address/provinces`,
+        type: "GET",
+        contentType: "application/json",
+        success: data => {
+
+            for (const province of data) {
+                const option = $(`<option value=${province.id}>${province.name}</option>`);
+                $("#province").append(option);
+            }
+            $("#message").text("Loaded provinces");
+
+            $("#province").change(() => {
+                $("#district").empty();
+                $("#commune").empty();
+                $("#district").append($(`<option value=\"\" selected></option>`));
+
+                // load districts
+                $.ajax({
+                    url: `${apiUrl}/address/districts?province-id=${$("#province").val()}`,
+                    type: "GET",
+                    contentType: "application/json",
+                    success: data => {
+                        for (const district of data) {
+                            const option = $(`<option value=${district.id}>${district.name}</option>`);
+                            $("#district").append(option);
+                        }
+                        $("#message").text("Loaded districts");
+
+                        $("#district").change(() => {
+                            $("#commune").empty();
+                            $("#commune").append($(`<option value=\"\" selected></option>`));
+
+                            // load districts
+                            $.ajax({
+                                url: `${apiUrl}/address/communes?district-id=${$("#district").val()}`,
+                                type: "GET",
+                                contentType: "application/json",
+                                success: data => {
+                                    for (const commune of data) {
+                                        const option = $(`<option value=${commune.id}>${commune.name}</option>`);
+                                        $("#commune").append(option);
+                                    }
+                                    $("#message").text("Loaded communes");
+                                }, 
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    if (jqXHR.responseJSON) {
+                                        const errorMessage = jqXHR.responseJSON.message; // Assuming "message" property holds the error message
+                                        $("#message").text(`Error: ${errorMessage}`);
+                                    } else {
+                                        // Handle cases where no error data is available from the server
+                                        $("#message").text("An unexpected error occurred.");
+                                    }    
+                                }
+                            });
+                        });
+                    }, 
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseJSON) {
+                            const errorMessage = jqXHR.responseJSON.message; // Assuming "message" property holds the error message
+                            $("#message").text(`Error: ${errorMessage}`);
+                        } else {
+                            // Handle cases where no error data is available from the server
+                            $("#message").text("An unexpected error occurred.");
+                        }    
+                    }
+                });
+            });
+        }, 
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.responseJSON) {
+                const errorMessage = jqXHR.responseJSON.message; // Assuming "message" property holds the error message
+                $("#message").text(`Error: ${errorMessage}`);
+            } else {
+                // Handle cases where no error data is available from the server
+                $("#message").text("An unexpected error occurred.");
+            }    
+        }
+    });
+
+    $("#register-btn").click((event) => {
+        event.preventDefault();
+
+        const data = {
+            email: $("#email").val(),
+            password: $("#password").val(),
+            roles: [ $("input[name='role']").val() ],
+            name: $("#name").val(),
+            gender: $("input[name='gender']").val(),
+            birthDate: $("#birth-date").val(),
+            phoneNumber: $("#phone-number").val() == '' ? null : $("#phone-number").val(),
+            provinceId: $("#province").val() == '' ? null : $("#province").val(),
+            districtId: $("#district").val() == '' ? null : $("#district").val(),
+            communeId: $("#commune").val() == '' ? null : $("#commune").val(),
+            detailedAddress: $("#detailed-address").val() == '' ? null : $("#detailed-address").val()
+        };
+
+        console.log(data);
+
+        $.ajax({
+            url: `${apiUrl}/users/register`,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            success: (data) => {
+                console.log(data);
+                $("#message").text(`Message: ${data.message}`);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseJSON) {
+                    const errorMessage = jqXHR.responseJSON.message; // Assuming "message" property holds the error message
+                    $("#message").text(`Error: ${errorMessage}`);
+                } else {
+                    // Handle cases where no error data is available from the server
+                    $("#message").text("An unexpected error occurred.");
+                }    
+            }
+        })
+    });
+
+
+</script>
+
+</body>
+</html>

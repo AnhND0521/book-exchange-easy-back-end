@@ -80,12 +80,23 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("Invalid date of birth");
         user.setBirthDate(registerRequest.getBirthDate());
 
-        AddressUnit province = addressUnitRepository.findById(registerRequest.getProvinceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Province", "id", registerRequest.getProvinceId()));
-        AddressUnit district = addressUnitRepository.findById(registerRequest.getDistrictId())
-                .orElseThrow(() -> new ResourceNotFoundException("District", "id", registerRequest.getDistrictId()));
-        AddressUnit commune = addressUnitRepository.findById(registerRequest.getCommuneId())
+        user.setIsLocked(false);
+        user.setIsVerified(false);
+        user = userRepository.save(user);
+
+        AddressUnit province = null;
+        AddressUnit district = null;
+        AddressUnit commune = null;
+        if (registerRequest.getProvinceId() != null)
+            province = addressUnitRepository.findById(registerRequest.getProvinceId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Province", "id", registerRequest.getProvinceId()));
+        if (registerRequest.getDistrictId() != null)
+            district = addressUnitRepository.findById(registerRequest.getDistrictId())
+                    .orElseThrow(() -> new ResourceNotFoundException("District", "id", registerRequest.getDistrictId()));
+        if (registerRequest.getCommuneId() != null)
+            commune = addressUnitRepository.findById(registerRequest.getCommuneId())
                 .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", registerRequest.getCommuneId()));
+
         ContactInfo contactInfo = ContactInfo.builder()
                 .phoneNumber(registerRequest.getPhoneNumber())
                 .province(province)
@@ -93,13 +104,8 @@ public class UserServiceImpl implements UserService {
                 .commune(commune)
                 .detailedAddress(registerRequest.getDetailedAddress())
                 .build();
-        contactInfo = contactInfoRepository.save(contactInfo);
-
-        user.setContactInfo(contactInfo);
-        user.setIsLocked(false);
-        user.setIsVerified(false);
-
-        userRepository.save(user);
+        contactInfo.setUser(user);
+        contactInfoRepository.save(contactInfo);
     }
 
     private String generateToken(User user) {
