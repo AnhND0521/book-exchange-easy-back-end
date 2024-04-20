@@ -12,4 +12,5 @@ public interface BookService {
     void deleteBook(Long bookId);
 
     List<BookDTO> getLatestBooks(int page, int size);
+    BookDTO getBookDetails(Long bookId);
 }

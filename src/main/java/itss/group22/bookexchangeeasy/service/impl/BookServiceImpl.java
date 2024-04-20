@@ -62,6 +62,8 @@ public class BookServiceImpl implements BookService {
         return books.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+
+
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", bookDTO.getOwnerId()));
@@ -80,4 +82,12 @@ public class BookServiceImpl implements BookService {
         dto.setStatus(book.getStatus().name());
         return dto;
     }
+    @Override
+    public BookDTO getBookDetails(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+        return toDTO(book);
+
+    }
+
 }

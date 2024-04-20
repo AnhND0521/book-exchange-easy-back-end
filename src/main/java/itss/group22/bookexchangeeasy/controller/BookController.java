@@ -1,14 +1,11 @@
 package itss.group22.bookexchangeeasy.controller;
-
 import itss.group22.bookexchangeeasy.dto.BookDTO;
-import itss.group22.bookexchangeeasy.dto.PostDTO;
 import itss.group22.bookexchangeeasy.dto.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -40,5 +37,9 @@ public class BookController {
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
     ) {
         return ResponseEntity.ok(bookService.getLatestBooks(page, size));
+    }
+    @GetMapping("/books/{bookId}")
+    public ResponseEntity<BookDTO> getBookDetails(@PathVariable Long bookId) {
+        return ResponseEntity.ok(bookService.getBookDetails(bookId));
     }
 }
