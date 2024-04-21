@@ -70,14 +70,6 @@ LOCK TABLES `event_concerned_users` WRITE;
 /*!40000 ALTER TABLE `event_concerned_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Dumping data for table `image`
---
-
-LOCK TABLES `image` WRITE;
-/*!40000 ALTER TABLE `image` DISABLE KEYS */;
-/*!40000 ALTER TABLE `image` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Dumping data for table `money_item`

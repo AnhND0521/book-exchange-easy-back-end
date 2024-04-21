@@ -1,16 +1,10 @@
 package itss.group22.bookexchangeeasy.dto;
 
-import itss.group22.bookexchangeeasy.entity.Post;
-import itss.group22.bookexchangeeasy.entity.User;
-import itss.group22.bookexchangeeasy.enums.BookStatus;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 

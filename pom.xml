@@ -74,6 +74,10 @@
 			<version>2.1.214</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jdbc</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
