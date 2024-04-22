@@ -64,12 +64,18 @@ public class TransactionServiceImpl implements TransactionService {
         if (!request.getTargetBook().getId().equals(bookId))
             throw new ApiException("Exchange request does not belong to specified book");
 
+        if (!request.getStatus().equals(ExchangeRequestStatus.PENDING))
+            throw new ApiException("Exchange request has already been handled");
+
         request.setStatus(ExchangeRequestStatus.ACCEPTED);
         exchangeRequestRepository.save(request);
 
         Transaction transaction = mapper.map(request, Transaction.class);
         transaction.setStatus(TransactionStatus.CONFIRMED);
         transactionRepository.save(transaction);
+
+        transaction.getTargetBook().setStatus(BookStatus.EXCHANGED);
+        bookRepository.save(transaction.getTargetBook());
 
         // auto reject other requests
         exchangeRequestRepository
@@ -90,6 +96,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (!request.getTargetBook().getId().equals(bookId))
             throw new ApiException("Exchange request does not belong to specified book");
+
+        if (!request.getStatus().equals(ExchangeRequestStatus.PENDING))
+            throw new ApiException("Exchange request has already been handled");
 
         request.setStatus(ExchangeRequestStatus.REJECTED);
         exchangeRequestRepository.save(request);
