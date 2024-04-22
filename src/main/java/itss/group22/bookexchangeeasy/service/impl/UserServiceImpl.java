@@ -82,7 +82,6 @@ public class UserServiceImpl implements UserService {
 
         user.setIsLocked(false);
         user.setIsVerified(false);
-        user = userRepository.save(user);
 
         AddressUnit province = null;
         AddressUnit district = null;
@@ -104,8 +103,10 @@ public class UserServiceImpl implements UserService {
                 .commune(commune)
                 .detailedAddress(registerRequest.getDetailedAddress())
                 .build();
-        contactInfo.setUser(user);
-        contactInfoRepository.save(contactInfo);
+        contactInfo = contactInfoRepository.save(contactInfo);
+
+        user.setContactInfo(contactInfo);
+        userRepository.save(user);
     }
 
     private String generateToken(User user) {

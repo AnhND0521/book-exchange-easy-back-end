@@ -1,6 +1,7 @@
 package itss.group22.bookexchangeeasy.entity;
 
 import itss.group22.bookexchangeeasy.enums.ExchangeItemType;
+import itss.group22.bookexchangeeasy.enums.ExchangeRequestStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +20,8 @@ import java.time.LocalDateTime;
 public class ExchangeRequest
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @CreationTimestamp
     private LocalDateTime timestamp;
@@ -48,4 +49,6 @@ public class ExchangeRequest
     @JoinColumn(name = "money_item_id")
     private MoneyItem moneyItem;
 
+    @Enumerated
+    private ExchangeRequestStatus status;
 }

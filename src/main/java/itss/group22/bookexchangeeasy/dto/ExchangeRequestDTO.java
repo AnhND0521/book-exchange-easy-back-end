@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +15,9 @@ import lombok.NoArgsConstructor;
 public class ExchangeRequestDTO {
     private Long userId;
     private Long bookId;
-    private String exchangeType;
+    private String exchangeItemType;
     private BookDTO bookItem;
     private MoneyItemDTO moneyItem;
+    private String status;
+    private LocalDateTime timestamp;
 }

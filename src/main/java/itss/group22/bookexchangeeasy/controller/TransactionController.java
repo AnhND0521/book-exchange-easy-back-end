@@ -14,14 +14,15 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class TransactionController {
     private final TransactionService transactionService;
-    @PostMapping("/transactions/request")
-    public ResponseEntity<ResponseMessage> createRequest(@RequestBody ExchangeRequestDTO requestDTO) {
+
+    @PostMapping("/books/{bookId}/requests")
+    public ResponseEntity<ResponseMessage> requestExchange(@PathVariable Long bookId, @RequestBody ExchangeRequestDTO requestDTO) {
+        transactionService.requestExchange(bookId, requestDTO);
         return ResponseEntity.ok(new ResponseMessage("Request created successfully"));
     }
-    @GetMapping("/transactions/request/{bookId}")
+
+    @GetMapping("/books/{bookId}/requests")
     public ResponseEntity<List<ExchangeRequestDTO>> getRequestsOfBook(@PathVariable Long bookId) {
-
-        return null;
-
+        return ResponseEntity.ok(transactionService.getRequestsOfBook(bookId));
     }
 }
