@@ -25,4 +25,16 @@ public class TransactionController {
     public ResponseEntity<List<ExchangeRequestDTO>> getRequestsOfBook(@PathVariable Long bookId) {
         return ResponseEntity.ok(transactionService.getRequestsOfBook(bookId));
     }
+
+    @PostMapping("/books/{bookId}/requests/{requestId}/accept")
+    public ResponseEntity<ResponseMessage> acceptRequest(@PathVariable Long bookId, @PathVariable Long requestId) {
+        transactionService.acceptRequest(bookId, requestId);
+        return ResponseEntity.ok(new ResponseMessage("Request accepted successfully"));
+    }
+
+    @PostMapping("/books/{bookId}/requests/{requestId}/reject")
+    public ResponseEntity<ResponseMessage> rejectRequest(@PathVariable Long bookId, @PathVariable Long requestId) {
+        transactionService.rejectRequest(bookId, requestId);
+        return ResponseEntity.ok(new ResponseMessage("Request rejected successfully"));
+    }
 }

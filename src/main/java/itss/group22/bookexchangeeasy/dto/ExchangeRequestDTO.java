@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 
 public class ExchangeRequestDTO {
+    private Long id;
     private Long userId;
     private Long bookId;
     private String exchangeItemType;
