@@ -2,8 +2,10 @@ package itss.group22.bookexchangeeasy.controller;
 
 import itss.group22.bookexchangeeasy.dto.ExchangeRequestDTO;
 import itss.group22.bookexchangeeasy.dto.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.TransactionDTO;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +38,22 @@ public class TransactionController {
     public ResponseEntity<ResponseMessage> rejectRequest(@PathVariable Long bookId, @PathVariable Long requestId) {
         transactionService.rejectRequest(bookId, requestId);
         return ResponseEntity.ok(new ResponseMessage("Request rejected successfully"));
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<Page<TransactionDTO>> getTransactions(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(transactionService.getTransactions(page, size));
+    }
+
+    @GetMapping("/transactions/find-by-user")
+    public ResponseEntity<Page<TransactionDTO>> getTransactionsByUser(
+            @RequestParam(name = "id", required = true) Long userId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(transactionService.getTransactionsByUser(userId, page, size));
     }
 }

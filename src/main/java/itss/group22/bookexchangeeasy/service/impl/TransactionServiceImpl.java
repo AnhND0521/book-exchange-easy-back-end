@@ -3,6 +3,7 @@ package itss.group22.bookexchangeeasy.service.impl;
 import itss.group22.bookexchangeeasy.dto.BookDTO;
 import itss.group22.bookexchangeeasy.dto.ExchangeRequestDTO;
 import itss.group22.bookexchangeeasy.dto.MoneyItemDTO;
+import itss.group22.bookexchangeeasy.dto.TransactionDTO;
 import itss.group22.bookexchangeeasy.entity.*;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import itss.group22.bookexchangeeasy.enums.ExchangeItemType;
@@ -14,6 +15,8 @@ import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -106,6 +109,22 @@ public class TransactionServiceImpl implements TransactionService {
         // notify user
     }
 
+    @Override
+    public Page<TransactionDTO> getTransactions(int page, int size) {
+        return transactionRepository
+                .findAllByOrderByTimestampDesc(PageRequest.of(page, size))
+                .map(this::toDTO);
+    }
+
+    @Override
+    public Page<TransactionDTO> getTransactionsByUser(Long userId, int page, int size) {
+        userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        return transactionRepository
+                .findByUserOrderByTimestampDesc(userId, PageRequest.of(page, size))
+                .map(this::toDTO);
+    }
+
     private ExchangeRequest toEntity(ExchangeRequestDTO requestDTO) {
         Book targetBook = bookRepository.findById(requestDTO.getBookId())
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "id", requestDTO.getBookId()));
@@ -121,7 +140,6 @@ public class TransactionServiceImpl implements TransactionService {
             bookItem.setStatus(BookStatus.EXCHANGED);
         } else {
             moneyItem = mapper.map(requestDTO.getMoneyItem(), MoneyItem.class);
-
         }
         return ExchangeRequest.builder()
                 .owner(owner)
@@ -144,5 +162,33 @@ public class TransactionServiceImpl implements TransactionService {
                 .status(request.getStatus().name())
                 .timestamp(request.getTimestamp())
                 .build();
+    }
+
+    private TransactionDTO toDTO(Transaction transaction) {
+        TransactionDTO dto = mapper.map(transaction, TransactionDTO.class);
+        dto.setOwnerId(transaction.getOwner().getId());
+        dto.setBorrowerId(transaction.getBorrower().getId());
+        dto.setExchangeItemType(transaction.getExchangeItemType().name());
+
+        BookDTO targetBookDTO = mapper.map(transaction.getTargetBook(), BookDTO.class);
+        targetBookDTO.setOwnerId(transaction.getTargetBook().getOwner().getId());
+        targetBookDTO.setStatus(transaction.getTargetBook().getStatus().name());
+        dto.setTargetBook(targetBookDTO);
+
+        switch (transaction.getExchangeItemType()) {
+            case BOOK -> {
+                BookDTO bookItemDTO = mapper.map(transaction.getBookItem(), BookDTO.class);
+                bookItemDTO.setOwnerId(transaction.getBookItem().getOwner().getId());
+                bookItemDTO.setStatus(transaction.getBookItem().getStatus().name());
+                dto.setBookItem(bookItemDTO);
+            }
+            case MONEY -> {
+                MoneyItemDTO moneyItemDTO = mapper.map(transaction.getMoneyItem(), MoneyItemDTO.class);
+                dto.setMoneyItem(moneyItemDTO);
+            }
+        }
+
+        dto.setStatus(transaction.getStatus().name());
+        return dto;
     }
 }
