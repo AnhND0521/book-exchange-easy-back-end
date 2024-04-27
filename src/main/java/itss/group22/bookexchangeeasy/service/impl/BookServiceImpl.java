@@ -11,6 +11,7 @@ import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -56,10 +57,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDTO> getLatestBooks(int page, int size) {
+    public Page<BookDTO> getLatestBooks(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Book> books = bookRepository.findByStatusOrderByCreatedDesc(BookStatus.AVAILABLE, pageable);
-        return books.stream().map(this::toDTO).collect(Collectors.toList());
+        Page<Book> books = bookRepository.findByStatusOrderByCreatedDesc(BookStatus.AVAILABLE, pageable);
+        return books.map(this::toDTO);
     }
 
 
