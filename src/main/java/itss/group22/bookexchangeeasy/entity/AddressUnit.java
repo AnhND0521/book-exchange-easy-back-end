@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Set;
 
@@ -16,18 +18,13 @@ import java.util.Set;
 @Builder
 public class AddressUnit {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", length = 20)
     private String id;
 
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private AddressUnit parent;
+    @Column(name = "parent_id", length = 20)
+    private String parentId;
 
     private Integer type;
-
-    @OneToMany(mappedBy = "parent")
-    private Set<AddressUnit> children;
 }

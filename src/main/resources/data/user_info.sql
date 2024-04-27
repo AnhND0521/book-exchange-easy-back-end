@@ -21,7 +21,7 @@
 
 LOCK TABLES `user_info` WRITE;
 /*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
-INSERT INTO `user_info` VALUES ('2002-12-31',1,_binary '\0',_binary '\0',NULL,'2024-04-22 12:50:31.444212',1,'2024-04-22 12:50:31.445209','alice@gmail.com','Alice Fuckerman','$2a$10$SwJOOSknxXrMFLkqq39AH.zcJoqbw4tU9V4JDoaALLcYRXHAqNw4e'),('2001-11-11',2,_binary '\0',_binary '\0',NULL,'2024-04-22 12:54:19.158460',2,'2024-04-22 12:54:19.158460','demo@gmail.com','Demo User','$2a$10$dABLSmcNUIcmJrH09yZRWeybkGdVsr71Gf..v0VAbZOGPz.VitJ32'),('2002-02-20',0,_binary '\0',_binary '\0',3,'2024-04-22 13:11:36.486345',3,'2024-04-22 13:11:36.621155','user1@gmail.com','User One','$2a$10$YVxwcFVgWwjjrRiRI3c.vOKmzZ2DOEUu1KHPQbaQmHMz7TCT2vweO');
+INSERT INTO `user_info` (birth_date,gender,is_locked,is_verified,contact_info_id,created,id,last_updated,email,name,password) VALUES ('2002-12-31',1,_binary '\0',_binary '\0',NULL,'2024-04-22 12:50:31.444212',1,'2024-04-22 12:50:31.445209','alice@gmail.com','Alice Fuckerman','$2a$10$SwJOOSknxXrMFLkqq39AH.zcJoqbw4tU9V4JDoaALLcYRXHAqNw4e'),('2001-11-11',2,_binary '\0',_binary '\0',NULL,'2024-04-22 12:54:19.158460',2,'2024-04-22 12:54:19.158460','demo@gmail.com','Demo User','$2a$10$dABLSmcNUIcmJrH09yZRWeybkGdVsr71Gf..v0VAbZOGPz.VitJ32'),('2002-02-20',0,_binary '\0',_binary '\0',3,'2024-04-22 13:11:36.486345',3,'2024-04-22 13:11:36.621155','user1@gmail.com','User One','$2a$10$YVxwcFVgWwjjrRiRI3c.vOKmzZ2DOEUu1KHPQbaQmHMz7TCT2vweO');
 /*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

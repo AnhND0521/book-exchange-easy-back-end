@@ -32,7 +32,7 @@ public class Initializer {
                 importSql("data/contact_info.sql");
             }
             if (userRepository.count() == 0) {
-                importSql("data/user_info.sql", "data/role.sql", "data/users_roles");
+                importSql("data/user_info.sql", "data/role.sql", "data/users_roles.sql");
             }
             if (bookRepository.count() == 0) {
                 importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");

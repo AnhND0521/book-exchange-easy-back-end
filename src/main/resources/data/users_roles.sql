@@ -21,7 +21,7 @@
 
 LOCK TABLES `users_roles` WRITE;
 /*!40000 ALTER TABLE `users_roles` DISABLE KEYS */;
-INSERT INTO `users_roles` VALUES (2,1),(2,2),(2,3);
+INSERT INTO `users_roles` (role_id,user_id) VALUES (2,1),(2,2),(2,3);
 /*!40000 ALTER TABLE `users_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

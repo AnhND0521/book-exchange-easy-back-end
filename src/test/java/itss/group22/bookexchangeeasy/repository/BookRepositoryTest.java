@@ -35,7 +35,7 @@ public class BookRepositoryTest {
             return Book.builder().name("Book" + i).author("Author" + i).created(created).status(BookStatus.AVAILABLE).build();
         }).toList());
 
-        var books = bookRepository.findByStatusOrderByCreatedDesc(BookStatus.AVAILABLE, PageRequest.of(0, 10));
+        var books = bookRepository.findByStatusOrderByCreatedDesc(BookStatus.AVAILABLE, PageRequest.of(0, 10)).toList();
 
         assertThat(books.size()).isEqualTo(10);
         for (int i = 0; i < books.size() - 1; i++) {

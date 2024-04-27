@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new ResourceNotFoundException("District", "id", registerRequest.getDistrictId()));
         if (registerRequest.getCommuneId() != null)
             commune = addressUnitRepository.findById(registerRequest.getCommuneId())
-                .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", registerRequest.getCommuneId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", registerRequest.getCommuneId()));
 
         ContactInfo contactInfo = ContactInfo.builder()
                 .phoneNumber(registerRequest.getPhoneNumber())
@@ -141,24 +141,35 @@ public class UserServiceImpl implements UserService {
         UserProfile userProfile = mapper.map(user, UserProfile.class);
         userProfile.setGender(user.getGender().name());
         userProfile.setRoles(user.getRoles().stream().map(Role::getName).toList());
-        userProfile.setProvince(AddressUnitDTO.builder()
-                .id(user.getContactInfo().getProvince().getId()).
-                name(user.getContactInfo().getProvince().getName()).build());
-        userProfile.setDistrict(AddressUnitDTO.builder()
-                .id(user.getContactInfo().getDistrict().getId()).
-                name(user.getContactInfo().getDistrict().getName()).build());
-        userProfile.setCommune(AddressUnitDTO.builder()
-                .id(user.getContactInfo().getCommune().getId()).
-                name(user.getContactInfo().getCommune().getName()).build());
 
-        userProfile.setDetailedAddress(user.getContactInfo().getDetailedAddress());
-        userProfile.setPhoneNumber(user.getContactInfo().getPhoneNumber());
+        if (user.getContactInfo() != null) {
+            userProfile.setPhoneNumber(user.getContactInfo().getPhoneNumber());
+
+            if (user.getContactInfo().getProvince() != null)
+                userProfile.setProvince(AddressUnitDTO.builder()
+                        .id(user.getContactInfo().getProvince().getId()).
+                        name(user.getContactInfo().getProvince().getName()).build());
+
+            if (user.getContactInfo().getDistrict() != null)
+                userProfile.setDistrict(AddressUnitDTO.builder()
+                        .id(user.getContactInfo().getDistrict().getId()).
+                        name(user.getContactInfo().getDistrict().getName()).build());
+
+            if (user.getContactInfo().getCommune() != null)
+                userProfile.setCommune(AddressUnitDTO.builder()
+                        .id(user.getContactInfo().getCommune().getId()).
+                        name(user.getContactInfo().getCommune().getName()).build());
+
+            userProfile.setDetailedAddress(user.getContactInfo().getDetailedAddress());
+        }
+
         return userProfile;
     }
 
     @Override
     public void updateProfile(Long id, UserProfile userProfile) {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        user.setName(userProfile.getName());
         user.setRoles(userProfile.getRoles().stream().map(name ->
                 roleRepository.findByName(name)
                         .orElseThrow(() -> new ResourceNotFoundException("role", "name", name))
@@ -169,25 +180,39 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("Invalid date of birth");
         user.setBirthDate(userProfile.getBirthDate());
 
-        AddressUnit province = addressUnitRepository.findById(userProfile.getProvince().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Province", "id", userProfile.getProvince().getId()));
-        AddressUnit district = addressUnitRepository.findById(userProfile.getDistrict().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("District", "id", userProfile.getDistrict().getId()));
-        AddressUnit commune = addressUnitRepository.findById(userProfile.getCommune().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", userProfile.getCommune().getId()));
-        ContactInfo contactInfo = ContactInfo.builder()
-                .phoneNumber(userProfile.getPhoneNumber())
-                .province(province)
-                .district(district)
-                .commune(commune)
-                .detailedAddress(userProfile.getDetailedAddress())
-                .build();
-        contactInfoRepository.save(contactInfo);
+        if (userProfile.hasContactInfo()) {
+            AddressUnit province = null, district = null, commune = null;
+            if (userProfile.getProvince() != null && userProfile.getProvince().getId() != null)
+                province = addressUnitRepository.findById(userProfile.getProvince().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Province", "id", userProfile.getProvince().getId()));
+            if (userProfile.getDistrict() != null && userProfile.getDistrict().getId() != null)
+                district = addressUnitRepository.findById(userProfile.getDistrict().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("District", "id", userProfile.getDistrict().getId()));
+            if (userProfile.getCommune() != null && userProfile.getCommune().getId() != null)
+                commune = addressUnitRepository.findById(userProfile.getCommune().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Commune", "id", userProfile.getCommune().getId()));
 
-        user.setContactInfo(contactInfo);
-        user.setEmail(userProfile.getEmail());
-        user.setName(userProfile.getName());
-        userRepository.save(user);
+            ContactInfo contactInfo = ContactInfo.builder()
+                    .phoneNumber(userProfile.getPhoneNumber())
+                    .province(province)
+                    .district(district)
+                    .commune(commune)
+                    .detailedAddress(userProfile.getDetailedAddress())
+                    .build();
+
+            if (!contactInfo.equals(user.getContactInfo())) {
+                ContactInfo oldContactInfo = user.getContactInfo();
+                contactInfoRepository.save(contactInfo);
+                user.setContactInfo(contactInfo);
+                userRepository.save(user);
+                if (oldContactInfo != null)
+                    contactInfoRepository.delete(oldContactInfo);
+            } else {
+                userRepository.save(user);
+            }
+        } else {
+            userRepository.save(user);
+        }
     }
 
     @Override

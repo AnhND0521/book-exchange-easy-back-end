@@ -12,7 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-public class AddressRepositoryTest {
+public class AddressUnitRepositoryTest {
     @Autowired
     private AddressUnitRepository addressUnitRepository;
 
@@ -34,38 +34,36 @@ public class AddressRepositoryTest {
                 .id("200001")
                 .name("Hai Bà Trưng")
                 .type(2)
+                .parentId("100001")
                 .build();
 
         AddressUnit hoanKiem = AddressUnit.builder()
                 .id("200002")
                 .name("Hoàn Kiếm")
                 .type(2)
+                .parentId("100001")
                 .build();
 
         AddressUnit dongTam = AddressUnit.builder()
                 .id("300001")
                 .name("Đồng Tâm")
                 .type(3)
+                .parentId("200001")
                 .build();
 
         AddressUnit truongDinh = AddressUnit.builder()
                 .id("300002")
                 .name("Trương Định")
                 .type(3)
+                .parentId("200001")
                 .build();
 
         AddressUnit bachKhoa = AddressUnit.builder()
                 .id("300003")
                 .name("Bách Khoa")
                 .type(3)
+                .parentId("200001")
                 .build();
-
-        haiBaTrung.setParent(hanoi);
-        hoanKiem.setParent(hanoi);
-
-        dongTam.setParent(haiBaTrung);
-        truongDinh.setParent(haiBaTrung);
-        bachKhoa.setParent(haiBaTrung);
 
         addressUnitRepository.saveAll(List.of(hanoi, hoChiMinh, haiBaTrung, hoanKiem, dongTam, truongDinh, bachKhoa));
     }
