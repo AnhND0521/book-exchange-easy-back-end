@@ -88,7 +88,6 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
         return toDTO(book);
-
     }
 
 }

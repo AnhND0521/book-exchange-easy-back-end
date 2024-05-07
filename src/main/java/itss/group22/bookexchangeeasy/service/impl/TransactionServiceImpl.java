@@ -12,8 +12,10 @@ import itss.group22.bookexchangeeasy.enums.TransactionStatus;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.*;
+import itss.group22.bookexchangeeasy.service.NotificationService;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,19 +25,21 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-
+@Slf4j
 public class TransactionServiceImpl implements TransactionService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
-    private final ModelMapper mapper;
     private final MoneyItemRepository moneyItemRepository;
     private final ExchangeRequestRepository exchangeRequestRepository;
     private final TransactionRepository transactionRepository;
+    private final NotificationService notificationService;
+    private final ModelMapper mapper;
 
     @Override
     public void requestExchange(Long bookId, ExchangeRequestDTO requestDTO) {
         requestDTO.setBookId(bookId);
         ExchangeRequest request = toEntity(requestDTO);
+
         if (!request.getTargetBook().getStatus().equals(BookStatus.AVAILABLE))
             throw new ApiException("Book is not available");
 
@@ -49,6 +53,12 @@ public class TransactionServiceImpl implements TransactionService {
         exchangeRequestRepository.save(request);
 
         // notify owner
+        notificationService.sendNotification(Notification.builder()
+                .user(request.getOwner())
+                .content("You've got a new offer on book '" + request.getTargetBook().getName()
+                        + "' from " + request.getBorrower().getName())
+                .href("book/" + request.getTargetBook().getId())
+                .build());
     }
 
     @Override
@@ -80,6 +90,13 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.getTargetBook().setStatus(BookStatus.EXCHANGED);
         bookRepository.save(transaction.getTargetBook());
 
+        // notify acceptance
+        notificationService.sendNotification(Notification.builder()
+                .user(request.getBorrower())
+                .content("Your offer on book '" + request.getTargetBook().getName() + "' has been accepted")
+                .href("transaction")
+                .build());
+
         // auto reject other requests
         exchangeRequestRepository
                 .findByTargetBookIdOrderByTimestampAsc(bookId)
@@ -88,7 +105,12 @@ public class TransactionServiceImpl implements TransactionService {
                     req.setStatus(ExchangeRequestStatus.REJECTED);
                     exchangeRequestRepository.save(req);
 
-                    // notify user
+                    // notify rejection
+                    notificationService.sendNotification(Notification.builder()
+                            .user(req.getBorrower())
+                            .content("Your offer on book '" + req.getTargetBook().getName() + "' has been rejected")
+                            .href("book/" + req.getTargetBook().getId())
+                            .build());
                 });
     }
 
@@ -107,6 +129,11 @@ public class TransactionServiceImpl implements TransactionService {
         exchangeRequestRepository.save(request);
 
         // notify user
+        notificationService.sendNotification(Notification.builder()
+                .user(request.getBorrower())
+                .content("Your offer on book '" + request.getTargetBook().getName() + "' has been rejected")
+                .href("book/" + request.getTargetBook().getId())
+                .build());
     }
 
     @Override
