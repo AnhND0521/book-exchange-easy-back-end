@@ -3,6 +3,7 @@
 <head>
 <title>Page Title</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="./utils.js"></script>
 </head>
 <body>
 
@@ -38,6 +39,8 @@
                 expires = new Date();
                 expires.setTime(expires.getTime() + 24*60*60*1000);
                 document.cookie = `access_token=${data.accessToken}; expires=${expires.toUTCString()}`;
+                console.log(parseJwt(data.accessToken));
+                document.cookie = `user_info=${JSON.stringify(parseJwt(data.accessToken))}; expires=${expires.toUTCString()}`;
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 if (jqXHR.responseJSON) {

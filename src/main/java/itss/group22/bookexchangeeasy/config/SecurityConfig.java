@@ -24,24 +24,22 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Value("${security.secret-key}")
+    @Value("${app.secret-key}")
     private String secretKey;
-
-//    @Autowired
-//    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.GET, "/api-docs", "/api-docs/**", "/swagger-ui/**", "/api/v1/address/**").permitAll()
+                request.requestMatchers(HttpMethod.GET, "/api-docs", "/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/auth", "/api/v1/users/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/address/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/ws/**").permitAll()
                         .anyRequest().authenticated()
         );
         http.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())));
         http.csrf(AbstractHttpConfigurer::disable);
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

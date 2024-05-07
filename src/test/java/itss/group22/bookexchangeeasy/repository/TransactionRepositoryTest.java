@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.repository;
 
 import itss.group22.bookexchangeeasy.entity.Transaction;
 import itss.group22.bookexchangeeasy.entity.User;
+import itss.group22.bookexchangeeasy.utils.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -34,15 +31,12 @@ public class TransactionRepositoryTest {
                 User.builder().id(3L).name("User 3").build()
         ));
 
-        long minEpoch = LocalDateTime.now().minusYears(1).toEpochSecond(ZoneOffset.UTC) * 1000;  // 1 year in the past
-        long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
         transactionRepository.saveAll(IntStream.range(0, 30).mapToObj(i -> {
-            LocalDateTime timestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(new Random().nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
             long ownerId = i % 3 + 1;
             long borrowerId = (i + 1) % 3 + 1;
             return Transaction.builder()
                     .id(UUID.randomUUID().toString())
-                    .timestamp(timestamp)
+                    .timestamp(RandomUtils.randomPastTime())
                     .owner(userRepository.findById(ownerId).orElse(null))
                     .borrower(userRepository.findById(borrowerId).orElse(null))
                     .build();

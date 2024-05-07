@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -26,4 +27,6 @@ public class ChatConversation {
     @ManyToOne
     @JoinColumn(name = "user_id_2")
     private User user2;
+
+    private LocalDateTime lastMessageTime;
 }

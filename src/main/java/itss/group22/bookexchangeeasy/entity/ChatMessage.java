@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.entity;
 
+import itss.group22.bookexchangeeasy.enums.MessageType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,11 @@ public class ChatMessage {
     @JoinColumn(name = "sender_id")
     private User sender;
 
-    private String messageType;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
+
+    private MessageType messageType;
 
     private String content;
 

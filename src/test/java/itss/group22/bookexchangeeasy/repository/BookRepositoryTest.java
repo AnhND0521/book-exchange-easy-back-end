@@ -2,16 +2,13 @@ package itss.group22.bookexchangeeasy.repository;
 
 import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
+import itss.group22.bookexchangeeasy.utils.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -28,12 +25,14 @@ public class BookRepositoryTest {
 
     @Test
     void givenBooks_whenFindByAvailableStatusOrderByCreatedDesc_thenReturnAvailableBooksInDecreasingTimeOrder() {
-        long minEpoch = LocalDateTime.now().minusYears(1).toEpochSecond(ZoneOffset.UTC) * 1000;  // 1 year in the past
-        long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
-        bookRepository.saveAll(IntStream.range(0, 20).mapToObj(i -> {
-            LocalDateTime created = LocalDateTime.ofInstant(Instant.ofEpochMilli(new Random().nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
-            return Book.builder().name("Book" + i).author("Author" + i).created(created).status(BookStatus.AVAILABLE).build();
-        }).toList());
+        bookRepository.saveAll(IntStream.range(0, 20).mapToObj(i ->
+                Book.builder()
+                        .name("Book" + i)
+                        .author("Author" + i)
+                        .created(RandomUtils.randomPastTime())
+                        .status(BookStatus.AVAILABLE)
+                        .build()
+        ).toList());
 
         var books = bookRepository.findByStatusOrderByCreatedDesc(BookStatus.AVAILABLE, PageRequest.of(0, 10)).toList();
 

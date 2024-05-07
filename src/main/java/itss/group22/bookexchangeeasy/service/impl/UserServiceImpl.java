@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
-    @Value("${security.secret-key}")
+    @Value("${app.secret-key}")
     private String secretKey;
 
     @Override
