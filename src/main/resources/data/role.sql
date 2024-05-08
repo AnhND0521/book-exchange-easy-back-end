@@ -16,22 +16,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `contact_info`
---
-
-LOCK TABLES `contact_info` WRITE;
-/*!40000 ALTER TABLE `contact_info` DISABLE KEYS */;
-INSERT INTO `contact_info` VALUES (1,'300454','200017','100001','Deo noi','0123456789'),(2,'300454','200017','100001','O dau con lau moi noi','0123456789'),(3,'300454','200017','100001','Somewhere on Earth','0123456789');
-/*!40000 ALTER TABLE `contact_info` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `role`
 --
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES (1,'ADMIN'),(2,'BOOK_EXCHANGER'),(3,'BOOKSTORE');
+INSERT INTO `role` (id,name) VALUES (1,'ADMIN'),(2,'BOOK_EXCHANGER'),(3,'BOOKSTORE');
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

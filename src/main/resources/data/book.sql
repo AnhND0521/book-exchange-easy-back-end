@@ -21,7 +21,7 @@
 
 LOCK TABLES `book` WRITE;
 /*!40000 ALTER TABLE `book` DISABLE KEYS */;
-INSERT INTO `book` VALUES (NULL,NULL,0,'2024-04-22 12:52:32.912123',1,1,NULL,'Me',NULL,NULL,NULL,'This Is Not A Book',NULL,NULL,NULL);
+INSERT INTO `book` (description,image_path,status,created,id,owner_id,language,author,pages,publish_year,publisher,name,size,weight,layout) VALUES (NULL,NULL,0,'2024-04-22 12:52:32.912123',1,1,NULL,'Me',NULL,NULL,NULL,'This Is Not A Book',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `book` ENABLE KEYS */;
 UNLOCK TABLES;
 

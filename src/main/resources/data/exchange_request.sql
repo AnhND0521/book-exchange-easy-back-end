@@ -21,7 +21,7 @@
 
 LOCK TABLES `exchange_request` WRITE;
 /*!40000 ALTER TABLE `exchange_request` DISABLE KEYS */;
-INSERT INTO `exchange_request` VALUES (1,1,'2024-04-22 13:07:19.919874',NULL,2,2,1,1,NULL);
+INSERT INTO `exchange_request` (id,owner_id,timestamp,book_item_id,borrower_id,money_item_id,target_book_id,exchange_item_type,status) VALUES (1,1,'2024-04-22 13:07:19.919874',NULL,2,2,1,1,0);
 /*!40000 ALTER TABLE `exchange_request` ENABLE KEYS */;
 UNLOCK TABLES;
 

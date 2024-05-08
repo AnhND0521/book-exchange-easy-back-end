@@ -8,25 +8,24 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-
 @Entity
-@Table(name = "chat_conversation")
+@Table(name = "notification")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatConversation {
+public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id_1")
-    private User user1;
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id_2")
-    private User user2;
+    private String content;
 
-    private LocalDateTime lastMessageTime;
+    private LocalDateTime timestamp;
+
+    private String href;
 }

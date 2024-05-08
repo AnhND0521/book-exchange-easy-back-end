@@ -21,7 +21,7 @@
 
 LOCK TABLES `money_item` WRITE;
 /*!40000 ALTER TABLE `money_item` DISABLE KEYS */;
-INSERT INTO `money_item` VALUES (999999,1,'USD'),(999999,2,'USD');
+INSERT INTO `money_item` (amount,id,unit) VALUES (999999,1,'USD'),(999999,2,'USD');
 /*!40000 ALTER TABLE `money_item` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

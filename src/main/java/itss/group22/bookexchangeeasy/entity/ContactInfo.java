@@ -1,10 +1,9 @@
 package itss.group22.bookexchangeeasy.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "contact_info")
@@ -15,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class ContactInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Exclude
     private Long id;
 
     private String phoneNumber;
@@ -33,7 +33,17 @@ public class ContactInfo {
 
     private String detailedAddress;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContactInfo that = (ContactInfo) o;
+
+        if (!Objects.equals(phoneNumber, that.phoneNumber)) return false;
+        if (!Objects.equals(province.getId(), that.province.getId())) return false;
+        if (!Objects.equals(district.getId(), that.district.getId())) return false;
+        if (!Objects.equals(commune.getId(), that.commune.getId())) return false;
+        return Objects.equals(detailedAddress, that.detailedAddress);
+    }
 }
