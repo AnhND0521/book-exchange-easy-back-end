@@ -30,9 +30,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.GET, "/api-docs", "/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users/auth", "/api/v1/users/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/address/**").permitAll()
+                request.requestMatchers(HttpMethod.GET, "/api-docs", "/api-docs/**", "/swagger-ui/**", "/api/v1/**").permitAll()
+                        // for test purpose
+                        .requestMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/api/v1/users/auth", "/api/v1/users/register").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/address/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/ws/**").permitAll()
                         .anyRequest().authenticated()
         );
