@@ -9,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,14 +29,6 @@ public class Post {
     private String title;
 
     private String content;
-
-//    private Boolean isBookPost;
-//
-//    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
-//    private Book book;
-//
-//    @OneToMany(mappedBy = "post")
-//    private List<Image> images;
 
     private String imagePath;
 

@@ -1,5 +1,4 @@
 package itss.group22.bookexchangeeasy.config;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

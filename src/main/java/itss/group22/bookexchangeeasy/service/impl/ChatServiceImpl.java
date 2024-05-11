@@ -1,5 +1,4 @@
 package itss.group22.bookexchangeeasy.service.impl;
-
 import itss.group22.bookexchangeeasy.dto.ChatConversationDTO;
 import itss.group22.bookexchangeeasy.dto.ChatMessageDTO;
 import itss.group22.bookexchangeeasy.entity.ChatConversation;

@@ -1,5 +1,4 @@
 package itss.group22.bookexchangeeasy.controller;
-
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.BookDTO;
 import itss.group22.bookexchangeeasy.dto.ResponseMessage;
@@ -9,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
