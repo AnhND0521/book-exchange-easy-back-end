@@ -20,15 +20,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,32 +139,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfile getProfile(Long id) {
         User user = userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        UserProfile userProfile = mapper.map(user, UserProfile.class);
-        userProfile.setGender(user.getGender().name());
-        userProfile.setRoles(user.getRoles().stream().map(Role::getName).toList());
-
-        if (user.getContactInfo() != null) {
-            userProfile.setPhoneNumber(user.getContactInfo().getPhoneNumber());
-
-            if (user.getContactInfo().getProvince() != null)
-                userProfile.setProvince(AddressUnitDTO.builder()
-                        .id(user.getContactInfo().getProvince().getId()).
-                        name(user.getContactInfo().getProvince().getName()).build());
-
-            if (user.getContactInfo().getDistrict() != null)
-                userProfile.setDistrict(AddressUnitDTO.builder()
-                        .id(user.getContactInfo().getDistrict().getId()).
-                        name(user.getContactInfo().getDistrict().getName()).build());
-
-            if (user.getContactInfo().getCommune() != null)
-                userProfile.setCommune(AddressUnitDTO.builder()
-                        .id(user.getContactInfo().getCommune().getId()).
-                        name(user.getContactInfo().getCommune().getName()).build());
-
-            userProfile.setDetailedAddress(user.getContactInfo().getDetailedAddress());
-        }
-
-        return userProfile;
+        return buildProfile(user);
     }
 
     @Override
@@ -224,4 +200,40 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public List<UserProfile> getUserList(int page, int size) {
+        return userRepository.findAllByOrderByEmailAsc(PageRequest.of(page, size))
+                .stream()
+                .map(this::buildProfile)
+                .toList();
+    }
+
+    private UserProfile buildProfile(User user) {
+        UserProfile userProfile = mapper.map(user, UserProfile.class);
+        userProfile.setGender(user.getGender().name());
+        userProfile.setRoles(user.getRoles().stream().map(Role::getName).toList());
+
+        if (user.getContactInfo() != null) {
+            userProfile.setPhoneNumber(user.getContactInfo().getPhoneNumber());
+
+            if (user.getContactInfo().getProvince() != null)
+                userProfile.setProvince(AddressUnitDTO.builder()
+                        .id(user.getContactInfo().getProvince().getId()).
+                        name(user.getContactInfo().getProvince().getName()).build());
+
+            if (user.getContactInfo().getDistrict() != null)
+                userProfile.setDistrict(AddressUnitDTO.builder()
+                        .id(user.getContactInfo().getDistrict().getId()).
+                        name(user.getContactInfo().getDistrict().getName()).build());
+
+            if (user.getContactInfo().getCommune() != null)
+                userProfile.setCommune(AddressUnitDTO.builder()
+                        .id(user.getContactInfo().getCommune().getId()).
+                        name(user.getContactInfo().getCommune().getName()).build());
+
+            userProfile.setDetailedAddress(user.getContactInfo().getDetailedAddress());
+        }
+
+        return userProfile;
+    }
 }
