@@ -56,6 +56,9 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
             throw new ApiException("Incorrect password", HttpStatus.FORBIDDEN);
 
+        if (user.getIsLocked())
+            throw new ApiException("User account is currently locked", HttpStatus.FORBIDDEN);
+
         String token = generateToken(user);
         log.info("Generated token");
 
@@ -214,6 +217,30 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(this::buildProfile)
                 .toList();
+    }
+
+    @Override
+    public void lockUserAccount(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        if (user.getIsLocked())
+            throw new ApiException("User account is already locked");
+
+        user.setIsLocked(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unlockUserAccount(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        if (!user.getIsLocked())
+            throw new ApiException("User account is not being locked");
+
+        user.setIsLocked(false);
+        userRepository.save(user);
     }
 
     private UserProfile buildProfile(User user) {

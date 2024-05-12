@@ -12,4 +12,6 @@ public interface UserService {
     void changePassword(Long id, ChangePasswordDTO changePasswordDTO);
     List<UserProfile> getUserList(int page, int size);
     List<UserProfile> searchUser(String keyword, int page, int size);
+    void lockUserAccount(Long id);
+    void unlockUserAccount(Long id);
 }

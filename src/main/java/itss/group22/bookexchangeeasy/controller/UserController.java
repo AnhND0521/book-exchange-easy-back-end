@@ -66,6 +66,7 @@ public class UserController {
     }
 
     @GetMapping("")
+    @Operation(summary = "Lấy danh sách tất cả người dùng")
     private ResponseEntity<List<UserProfile>> getUserList(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "50") int size
@@ -74,11 +75,26 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Tìm kiếm người dùng")
     private ResponseEntity<List<UserProfile>> searchUser(
             @RequestParam(name = "q") String keyword,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(userService.searchUser(keyword, page, size));
+    }
+
+    @PutMapping("/{id}/lock")
+    @Operation(summary = "Khoá tài khoản người dùng")
+    private ResponseEntity<ResponseMessage> lockUserAccount(@PathVariable Long id) {
+        userService.lockUserAccount(id);
+        return ResponseEntity.ok(new ResponseMessage("User account locked successfully"));
+    }
+
+    @PutMapping("/{id}/unlock")
+    @Operation(summary = "Khoá tài khoản người dùng")
+    private ResponseEntity<ResponseMessage> unlockUserAccount(@PathVariable Long id) {
+        userService.unlockUserAccount(id);
+        return ResponseEntity.ok(new ResponseMessage("User account unlocked successfully"));
     }
 }
