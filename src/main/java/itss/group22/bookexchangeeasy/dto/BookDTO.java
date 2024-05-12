@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,6 +29,7 @@ public class BookDTO {
     private String layout;
     private String description;
     private String imagePath;
+    private List<String> categories;
     private String status;
     private LocalDateTime created;
 }

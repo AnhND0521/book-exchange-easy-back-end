@@ -2,11 +2,13 @@ package itss.group22.bookexchangeeasy.service.impl;
 
 import itss.group22.bookexchangeeasy.dto.BookDTO;
 import itss.group22.bookexchangeeasy.entity.Book;
+import itss.group22.bookexchangeeasy.entity.Category;
 import itss.group22.bookexchangeeasy.entity.User;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.BookRepository;
+import itss.group22.bookexchangeeasy.repository.CategoryRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final CategoryRepository categoryRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -63,7 +67,12 @@ public class BookServiceImpl implements BookService {
         return books.map(this::toDTO);
     }
 
-
+    @Override
+    public BookDTO getBookDetails(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+        return toDTO(book);
+    }
 
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())
@@ -74,6 +83,18 @@ public class BookServiceImpl implements BookService {
         else
             book.setStatus(BookStatus.valueOf(bookDTO.getStatus()));
         book.setOwner(user);
+
+        if (bookDTO.getCategories() != null && bookDTO.getCategories().size() > 0) {
+            List<Category> categories = bookDTO.getCategories().stream()
+                    .map(name -> {
+                        Optional<Category> category = categoryRepository.findByName(name);
+                        if (category.isPresent())
+                            return category.get();
+                        return categoryRepository.save(Category.builder().name(name).build());
+                    }).toList();
+            book.setCategories(categories);
+        }
+
         return book;
     }
 
@@ -81,13 +102,8 @@ public class BookServiceImpl implements BookService {
         BookDTO dto = mapper.map(book, BookDTO.class);
         dto.setOwnerId(book.getOwner().getId());
         dto.setStatus(book.getStatus().name());
+        dto.setCategories(book.getCategories().stream().map(Category::getName).toList());
         return dto;
-    }
-    @Override
-    public BookDTO getBookDetails(Long bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
-        return toDTO(book);
     }
 
 }

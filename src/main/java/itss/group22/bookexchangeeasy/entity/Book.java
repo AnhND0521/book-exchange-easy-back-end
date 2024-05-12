@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "book")
@@ -34,12 +35,16 @@ public class Book {
     private String description;
     private String imagePath;
 
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "books_categories",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
+
     @Enumerated
     private BookStatus status;
-
-//    @OneToOne
-//    @JoinColumn(name = "post_id")
-//    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
