@@ -7,9 +7,7 @@ import itss.group22.bookexchangeeasy.entity.User;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
-import itss.group22.bookexchangeeasy.repository.BookRepository;
-import itss.group22.bookexchangeeasy.repository.CategoryRepository;
-import itss.group22.bookexchangeeasy.repository.UserRepository;
+import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,6 +27,8 @@ public class BookServiceImpl implements BookService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
+    private final ExchangeRequestRepository exchangeRequestRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -57,6 +57,17 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+        if (book.getStatus().equals(BookStatus.EXCHANGED))
+            throw new ApiException("The book can't be deleted as it is currently in an exchange");
+
+        var transactions = transactionRepository.findByTargetBookId(bookId);
+        transactionRepository.saveAll(transactions.stream().peek(transaction -> transaction.setTargetBook(null)).toList());
+
+        var requests = exchangeRequestRepository.findByTargetBookIdOrderByTimestampAsc(bookId);
+        exchangeRequestRepository.deleteAll(requests);
+
+        book.setCategories(null);
+        book = bookRepository.save(book);
         bookRepository.delete(book);
     }
 
