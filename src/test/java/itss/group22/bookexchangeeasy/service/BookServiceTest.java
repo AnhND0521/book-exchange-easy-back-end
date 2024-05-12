@@ -6,8 +6,7 @@ import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.User;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import itss.group22.bookexchangeeasy.enums.Gender;
-import itss.group22.bookexchangeeasy.repository.BookRepository;
-import itss.group22.bookexchangeeasy.repository.UserRepository;
+import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,13 +27,19 @@ class BookServiceTest {
     private BookRepository bookRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
+    private TransactionRepository transactionRepository;
+    @Mock
+    private ExchangeRequestRepository exchangeRequestRepository;
     private ModelMapper mapper;
     private BookService bookService;
 
     @BeforeEach
     void setUp() {
         mapper = new ModelMapper();
-        bookService = new BookServiceImpl(userRepository, bookRepository, mapper);
+        bookService = new BookServiceImpl(userRepository, bookRepository, categoryRepository, transactionRepository, exchangeRequestRepository, mapper);
     }
 
     @Test

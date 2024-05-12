@@ -72,4 +72,13 @@ public class UserController {
     ) {
         return ResponseEntity.ok(userService.getUserList(page, size));
     }
+
+    @GetMapping("/search")
+    private ResponseEntity<List<UserProfile>> searchUser(
+            @RequestParam(name = "q") String keyword,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "50") int size
+    ) {
+        return ResponseEntity.ok(userService.searchUser(keyword, page, size));
+    }
 }

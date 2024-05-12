@@ -208,6 +208,14 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    @Override
+    public List<UserProfile> searchUser(String keyword, int page, int size) {
+        return userRepository.findByEmailOrName(keyword, PageRequest.of(page, size))
+                .stream()
+                .map(this::buildProfile)
+                .toList();
+    }
+
     private UserProfile buildProfile(User user) {
         UserProfile userProfile = mapper.map(user, UserProfile.class);
         userProfile.setGender(user.getGender().name());
