@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -61,5 +63,13 @@ public class UserController {
     private ResponseEntity<ResponseMessage> changePassword(@PathVariable Long id, @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
         userService.changePassword(id, changePasswordDTO);
         return ResponseEntity.ok(new ResponseMessage("Password changed successfully"));
+    }
+
+    @GetMapping("")
+    private ResponseEntity<List<UserProfile>> getUserList(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "50") int size
+    ) {
+        return ResponseEntity.ok(userService.getUserList(page, size));
     }
 }

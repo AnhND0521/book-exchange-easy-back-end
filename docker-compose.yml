@@ -9,7 +9,7 @@ services:
     networks:
       springboot-mysql-network:
     volumes:
-      - db-data:/var/lib/mysql
+      - ./db:/var/lib/mysql
 
   book-exchange-easy-back-end:
     container_name: book-exchange-easy-back-end
@@ -21,7 +21,9 @@ services:
       - "8080:8080"
     networks:
       springboot-mysql-network:
-    restart: on-failure
+    depends_on:
+      - mysqldb
+#    restart: on-failure
 
 networks:
   springboot-mysql-network:
