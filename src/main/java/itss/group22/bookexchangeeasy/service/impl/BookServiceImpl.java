@@ -94,6 +94,13 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
+    @Override
+    public List<BookDTO> searchBook(String keyword, int page, int size) {
+        return bookRepository.findByAuthorOrName(keyword, PageRequest.of(page, size)).stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", bookDTO.getOwnerId()));

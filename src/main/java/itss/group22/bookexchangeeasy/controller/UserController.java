@@ -92,7 +92,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/unlock")
-    @Operation(summary = "Khoá tài khoản người dùng")
+    @Operation(summary = "Mở khoá tài khoản người dùng")
     private ResponseEntity<ResponseMessage> unlockUserAccount(@PathVariable Long id) {
         userService.unlockUserAccount(id);
         return ResponseEntity.ok(new ResponseMessage("User account unlocked successfully"));

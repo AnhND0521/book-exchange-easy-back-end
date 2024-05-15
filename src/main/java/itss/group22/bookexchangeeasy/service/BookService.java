@@ -12,4 +12,5 @@ public interface BookService {
     Page<BookDTO> getLatestBooks(int page, int size);
     BookDTO getBookDetails(Long bookId);
     List<BookDTO> getBookList(int page,int size);
+    List<BookDTO> searchBook(String keyword,int page,int size);
 }
