@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.BookDTO;
 import itss.group22.bookexchangeeasy.dto.ResponseMessage;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -61,6 +64,7 @@ public class BookController {
     public ResponseEntity<BookDTO> getBookDetails(@PathVariable Long bookId) {
         return ResponseEntity.ok(bookService.getBookDetails(bookId));
     }
+
     @GetMapping("")
     private ResponseEntity<List<BookDTO>> getBookList(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -68,6 +72,7 @@ public class BookController {
     ) {
         return ResponseEntity.ok(bookService.getBookList(page, size));
     }
+
     @GetMapping("/search")
     @Operation(summary = "Tìm kiếm sách")
     private ResponseEntity<List<BookDTO>> searchBook(
@@ -77,5 +82,14 @@ public class BookController {
     ) {
         return ResponseEntity.ok(bookService.searchBook(keyword, page, size));
     }
+
+    @GetMapping("/statistics/{period}")
+    @Operation(summary = "Thống kê số lượng sách đã trao đổi theo ngày, tháng, quý, năm")
+    public ResponseEntity<Long> getExchangedBooks(
+                                                  @RequestParam(name = "start_date", required = false, defaultValue = "2024-01-01") LocalDateTime fromDate, // Today's date
+                                                  @RequestParam(name = "start_date", required = false, defaultValue = "2024-31-12") LocalDateTime toDate) {
+        return ResponseEntity.ok(bookService.getExchangedBooks( fromDate, toDate));
+    }
+
 
 }

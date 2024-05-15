@@ -17,8 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -100,6 +104,15 @@ public class BookServiceImpl implements BookService {
                 .map(this::toDTO)
                 .toList();
     }
+
+    @Override
+    public Long getExchangedBooks( LocalDateTime fromDate, LocalDateTime toDate) {
+        BookStatus exchangedStatus = BookStatus.EXCHANGED; // Assuming exchanged books have this status
+        return bookRepository.countByStatusAndCreatedDateBetween(exchangedStatus, fromDate, toDate);
+
+    }
+
+
 
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())
