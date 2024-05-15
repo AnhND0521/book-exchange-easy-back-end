@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -83,6 +85,13 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
         return toDTO(book);
+    }
+
+    @Override
+    public List<BookDTO> getBookList(int page, int size) {
+        return bookRepository.findAllByOrderByCreatedDesc(PageRequest.of(page, size)).stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     private Book toEntity(BookDTO bookDTO) {

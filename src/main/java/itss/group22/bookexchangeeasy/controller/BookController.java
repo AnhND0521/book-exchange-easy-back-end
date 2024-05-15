@@ -2,12 +2,15 @@ package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.BookDTO;
 import itss.group22.bookexchangeeasy.dto.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.UserProfile;
 import itss.group22.bookexchangeeasy.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -58,4 +61,12 @@ public class BookController {
     public ResponseEntity<BookDTO> getBookDetails(@PathVariable Long bookId) {
         return ResponseEntity.ok(bookService.getBookDetails(bookId));
     }
+    @GetMapping("")
+    private ResponseEntity<List<BookDTO>> getBookList(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "50") int size
+    ) {
+        return ResponseEntity.ok(bookService.getBookList(page, size));
+    }
+
 }

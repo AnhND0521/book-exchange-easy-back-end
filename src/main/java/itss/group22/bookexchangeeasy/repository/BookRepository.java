@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findByStatusOrderByCreatedDesc(BookStatus bookStatus, Pageable pageable);
+    List<Book> findAllByOrderByCreatedDesc(Pageable pageable);
 }
