@@ -7,6 +7,7 @@ import itss.group22.bookexchangeeasy.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,61 +17,29 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public OverviewStatistics getOverviewStatistics() {
         return OverviewStatistics.builder()
-                .allBooks(countAllBooks())
-                .newBooksThisMonth(countNewBooksThisMonth())
-                .allTransactions(countAllTransactions())
-                .transactionsThisMonth(countTransactionsThisMonth())
-                .allUsers(countAllUsers())
-                .newUsersThisMonth(countNewUsersThisMonth())
-                .allEvents(countAllEvents())
-                .eventsThisMonth(countEventsThisMonth())
-                .transactionPercentagesByStatus()
-                .newBooksByDate()
-                .transactionsByDate()
+//                .allBooks()
+//                .newBooksThisMonth()
+//                .allTransactions()
+//                .transactionsThisMonth()
+//                .allUsers()
+//                .newUsersThisMonth()
+//                .allEvents()
+//                .eventsThisMonth()
                 .build();
     }
 
-    private long countAllBooks() {
-        return 0;
-    }
-
-    private long countNewBooksThisMonth() {
-        return 0;
-    }
-
-    private long countAllTransactions() {
-        return 0;
-    }
-
-    private long countTransactionsThisMonth() {
-        return 0;
-    }
-
-    private long countAllUsers() {
-        return 0;
-    }
-
-    private long countNewUsersThisMonth() {
-        return 0;
-    }
-
-    private long countAllEvents() {
-        return 0;
-    }
-
-    private long countEventsThisMonth() {
-        return 0;
-    }
-
-    private List<PieChartItem> calculateTransactionPercentagesByStatus() {
+    @Override
+    public List<PieChartItem> getTransactionPercentagesByStatus(String filterBy) {
         return null;
     }
 
-    private List<LineChartItem> countNewBooksByDate() {
+    @Override
+    public List<LineChartItem> getNewBookCountByDate(LocalDate from, LocalDate to) {
         return null;
     }
 
-    private List<LineChartItem> countTransactionsByDate() {
+    @Override
+    public List<LineChartItem> getTransactionCountByDate(LocalDate from, LocalDate to) {
         return null;
     }
 }

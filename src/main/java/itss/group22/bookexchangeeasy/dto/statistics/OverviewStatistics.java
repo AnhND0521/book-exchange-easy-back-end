@@ -20,7 +20,4 @@ public class OverviewStatistics {
     private long newUsersThisMonth;
     private long allEvents;
     private long eventsThisMonth;
-    private List<PieChartItem> transactionPercentagesByStatus;
-    private List<LineChartItem> newBooksByDate;
-    private List<LineChartItem> transactionsByDate;
 }

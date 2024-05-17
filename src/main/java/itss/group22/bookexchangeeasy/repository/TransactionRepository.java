@@ -1,6 +1,7 @@
 package itss.group22.bookexchangeeasy.repository;
 
 import itss.group22.bookexchangeeasy.entity.Transaction;
+import itss.group22.bookexchangeeasy.enums.TransactionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     Page<Transaction> findByUserOrderByTimestampDesc(Long userId, Pageable pageable);
 
     List<Transaction> findByTargetBookId(Long bookId);
+
+    long countByStatus(TransactionStatus status);
 }
