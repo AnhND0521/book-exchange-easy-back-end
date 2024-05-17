@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.controller;
 
-import itss.group22.bookexchangeeasy.dto.EventDTO;
-import itss.group22.bookexchangeeasy.dto.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.community.EventDTO;
+import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

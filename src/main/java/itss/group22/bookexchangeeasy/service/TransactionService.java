@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.service;
 
-import itss.group22.bookexchangeeasy.dto.ExchangeRequestDTO;
-import itss.group22.bookexchangeeasy.dto.TransactionDTO;
+import itss.group22.bookexchangeeasy.dto.book.ExchangeRequestDTO;
+import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

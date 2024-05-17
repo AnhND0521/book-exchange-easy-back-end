@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,14 +11,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class ExchangeRequestDTO {
-    private Long id;
-    private Long userId;
-    private Long bookId;
+public class TransactionDTO {
+    private String id;
+    private LocalDateTime timestamp;
+    private LocalDateTime lastUpdated;
+    private Long ownerId;
+    private Long borrowerId;
+    private BookDTO targetBook;
     private String exchangeItemType;
     private BookDTO bookItem;
     private MoneyItemDTO moneyItem;
     private String status;
-    private LocalDateTime timestamp;
 }

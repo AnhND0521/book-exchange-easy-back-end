@@ -1,8 +1,8 @@
 package itss.group22.bookexchangeeasy.service.impl;
-import itss.group22.bookexchangeeasy.dto.BookDTO;
-import itss.group22.bookexchangeeasy.dto.ExchangeRequestDTO;
-import itss.group22.bookexchangeeasy.dto.MoneyItemDTO;
-import itss.group22.bookexchangeeasy.dto.TransactionDTO;
+import itss.group22.bookexchangeeasy.dto.book.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.ExchangeRequestDTO;
+import itss.group22.bookexchangeeasy.dto.book.MoneyItemDTO;
+import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.entity.*;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import itss.group22.bookexchangeeasy.enums.ExchangeItemType;

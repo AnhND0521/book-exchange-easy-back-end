@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotificationDTO {
+
+public class ExchangeRequestDTO {
     private Long id;
     private Long userId;
-    private String content;
+    private Long bookId;
+    private String exchangeItemType;
+    private BookDTO bookItem;
+    private MoneyItemDTO moneyItem;
+    private String status;
     private LocalDateTime timestamp;
-    private String href;
 }

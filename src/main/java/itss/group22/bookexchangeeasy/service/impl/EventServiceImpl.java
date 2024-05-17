@@ -1,5 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
-import itss.group22.bookexchangeeasy.dto.EventDTO;
+import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.entity.StoreEvent;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.StoreEventRepository;

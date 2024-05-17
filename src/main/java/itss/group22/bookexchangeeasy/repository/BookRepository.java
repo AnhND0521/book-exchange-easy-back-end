@@ -14,6 +14,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findByStatusOrderByCreatedDesc(BookStatus bookStatus, Pageable pageable);
     List<Book> findAllByOrderByCreatedDesc(Pageable pageable);
     @Query("SELECT b FROM Book b WHERE LOWER(b.name) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', ?1, '%'))")
-    List<Book> findByAuthorOrName(String keyword, Pageable pageable);
+    List<Book> findByNameOrAuthor(String keyword, Pageable pageable);
     Long countByStatusAndCreatedDateBetween(BookStatus status, LocalDateTime fromDate, LocalDateTime toDate);
 }

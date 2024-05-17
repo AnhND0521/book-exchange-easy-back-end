@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.AddressUnitDTO;
+import itss.group22.bookexchangeeasy.dto.user.AddressUnitDTO;
 import itss.group22.bookexchangeeasy.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

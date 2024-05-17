@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.exception;
 
-import itss.group22.bookexchangeeasy.dto.ErrorMessage;
+import itss.group22.bookexchangeeasy.dto.common.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

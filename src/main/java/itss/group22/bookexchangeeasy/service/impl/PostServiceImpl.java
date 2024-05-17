@@ -1,5 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
-import itss.group22.bookexchangeeasy.dto.PostDTO;
+import itss.group22.bookexchangeeasy.dto.community.PostDTO;
 import itss.group22.bookexchangeeasy.entity.Post;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.PostRepository;

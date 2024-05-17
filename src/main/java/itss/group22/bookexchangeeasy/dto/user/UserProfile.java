@@ -1,9 +1,8 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.user;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import itss.group22.bookexchangeeasy.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

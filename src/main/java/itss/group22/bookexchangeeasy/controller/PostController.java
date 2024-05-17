@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.controller;
 
-import itss.group22.bookexchangeeasy.dto.PostDTO;
+import itss.group22.bookexchangeeasy.dto.community.PostDTO;
 import itss.group22.bookexchangeeasy.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

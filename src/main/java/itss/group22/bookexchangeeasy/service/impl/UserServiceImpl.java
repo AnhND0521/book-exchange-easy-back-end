@@ -3,7 +3,7 @@ package itss.group22.bookexchangeeasy.service.impl;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
-import itss.group22.bookexchangeeasy.dto.*;
+import itss.group22.bookexchangeeasy.dto.user.*;
 import itss.group22.bookexchangeeasy.entity.AddressUnit;
 import itss.group22.bookexchangeeasy.entity.ContactInfo;
 import itss.group22.bookexchangeeasy.entity.Role;

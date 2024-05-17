@@ -1,6 +1,5 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.community;
 
-import itss.group22.bookexchangeeasy.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

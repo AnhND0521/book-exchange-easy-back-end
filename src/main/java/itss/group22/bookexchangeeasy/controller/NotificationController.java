@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.controller;
 
-import itss.group22.bookexchangeeasy.dto.NotificationDTO;
+import itss.group22.bookexchangeeasy.dto.common.NotificationDTO;
 import itss.group22.bookexchangeeasy.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

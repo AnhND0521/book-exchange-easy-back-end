@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

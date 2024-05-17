@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.service;
 
-import itss.group22.bookexchangeeasy.dto.NotificationDTO;
+import itss.group22.bookexchangeeasy.dto.common.NotificationDTO;
 import itss.group22.bookexchangeeasy.entity.Notification;
 import org.springframework.data.domain.Page;
 

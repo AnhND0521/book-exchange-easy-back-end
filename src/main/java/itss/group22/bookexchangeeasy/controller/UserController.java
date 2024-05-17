@@ -1,7 +1,8 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.*;
+import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.user.*;
 import itss.group22.bookexchangeeasy.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

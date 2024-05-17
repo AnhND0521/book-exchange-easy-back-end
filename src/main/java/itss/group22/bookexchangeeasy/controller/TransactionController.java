@@ -1,9 +1,9 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.ExchangeRequestDTO;
-import itss.group22.bookexchangeeasy.dto.ResponseMessage;
-import itss.group22.bookexchangeeasy.dto.TransactionDTO;
+import itss.group22.bookexchangeeasy.dto.book.ExchangeRequestDTO;
+import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

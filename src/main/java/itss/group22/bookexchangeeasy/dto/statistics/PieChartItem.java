@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.statistics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddressUnitDTO {
-    private String id;
-    private String name;
+public class PieChartItem {
+    private String proportionName;
+    private double percentage;
 }

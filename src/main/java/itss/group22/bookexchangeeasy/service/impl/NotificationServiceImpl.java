@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.service.impl;
 
-import itss.group22.bookexchangeeasy.dto.NotificationDTO;
+import itss.group22.bookexchangeeasy.dto.common.NotificationDTO;
 import itss.group22.bookexchangeeasy.entity.Notification;
 import itss.group22.bookexchangeeasy.repository.NotificationRepository;
 import itss.group22.bookexchangeeasy.service.NotificationService;

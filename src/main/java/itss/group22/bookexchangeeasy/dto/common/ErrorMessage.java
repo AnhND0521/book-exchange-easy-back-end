@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.common;
 
 import lombok.Data;
 

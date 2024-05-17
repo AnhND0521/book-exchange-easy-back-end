@@ -1,9 +1,8 @@
 package itss.group22.bookexchangeeasy.service;
 
-import itss.group22.bookexchangeeasy.dto.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

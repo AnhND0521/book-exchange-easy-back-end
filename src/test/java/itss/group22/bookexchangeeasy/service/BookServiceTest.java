@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.service;
 
 
-import itss.group22.bookexchangeeasy.dto.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.User;
 import itss.group22.bookexchangeeasy.enums.BookStatus;

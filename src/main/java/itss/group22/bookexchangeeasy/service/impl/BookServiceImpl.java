@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.service.impl;
 
-import itss.group22.bookexchangeeasy.dto.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.Category;
 import itss.group22.bookexchangeeasy.entity.User;
@@ -17,15 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -100,18 +94,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDTO> searchBook(String keyword, int page, int size) {
-        return bookRepository.findByAuthorOrName(keyword, PageRequest.of(page, size)).stream()
+        return bookRepository.findByNameOrAuthor(keyword, PageRequest.of(page, size)).stream()
                 .map(this::toDTO)
                 .toList();
     }
 
     @Override
-    public Long getExchangedBooks( LocalDateTime fromDate, LocalDateTime toDate) {
+    public Long getExchangedBooks(LocalDateTime fromDate, LocalDateTime toDate) {
         BookStatus exchangedStatus = BookStatus.EXCHANGED; // Assuming exchanged books have this status
         return bookRepository.countByStatusAndCreatedDateBetween(exchangedStatus, fromDate, toDate);
-
     }
-
 
 
     private Book toEntity(BookDTO bookDTO) {

@@ -1,6 +1,6 @@
 package itss.group22.bookexchangeeasy.service;
 
-import itss.group22.bookexchangeeasy.dto.*;
+import itss.group22.bookexchangeeasy.dto.user.*;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto;
+package itss.group22.bookexchangeeasy.dto.book;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
