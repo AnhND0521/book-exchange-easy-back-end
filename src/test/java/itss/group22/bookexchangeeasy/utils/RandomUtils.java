@@ -11,4 +11,10 @@ public class RandomUtils {
         long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(new Random().nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
     }
+
+    public static LocalDateTime randomPastTime(int daysBefore) {
+        long minEpoch = LocalDateTime.now().minusDays(daysBefore).toEpochSecond(ZoneOffset.UTC) * 1000;
+        long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(new Random().nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
+    }
 }

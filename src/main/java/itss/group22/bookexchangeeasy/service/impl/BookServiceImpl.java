@@ -102,7 +102,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Long getExchangedBooks(LocalDateTime fromDate, LocalDateTime toDate) {
         BookStatus exchangedStatus = BookStatus.EXCHANGED; // Assuming exchanged books have this status
-        return bookRepository.countByStatusAndCreatedDateBetween(exchangedStatus, fromDate, toDate);
+        return bookRepository.countByStatusAndCreatedBetween(exchangedStatus, fromDate, toDate);
     }
 
 
