@@ -1,5 +1,4 @@
 package itss.group22.bookexchangeeasy.service.impl;
-
 import itss.group22.bookexchangeeasy.dto.statistics.LineChartItem;
 import itss.group22.bookexchangeeasy.dto.statistics.OverviewStatistics;
 import itss.group22.bookexchangeeasy.dto.statistics.PieChartItem;
