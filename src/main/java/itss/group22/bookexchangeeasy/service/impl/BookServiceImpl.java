@@ -94,7 +94,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDTO> searchBook(String keyword, int page, int size) {
-        return bookRepository.findByNameOrAuthor(keyword, PageRequest.of(page, size)).stream()
+        return bookRepository.findByTitleOrAuthor(keyword, PageRequest.of(page, size)).stream()
                 .map(this::toDTO)
                 .toList();
     }

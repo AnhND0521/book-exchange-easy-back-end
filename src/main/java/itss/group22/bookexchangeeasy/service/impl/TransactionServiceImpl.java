@@ -53,7 +53,7 @@ public class TransactionServiceImpl implements TransactionService {
         // notify owner
         notificationService.sendNotification(Notification.builder()
                 .user(request.getOwner())
-                .content("You've got a new offer on book '" + request.getTargetBook().getName()
+                .content("You've got a new offer on book '" + request.getTargetBook().getTitle()
                         + "' from " + request.getBorrower().getName())
                 .href("book/" + request.getTargetBook().getId())
                 .build());
@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         // notify acceptance
         notificationService.sendNotification(Notification.builder()
                 .user(request.getBorrower())
-                .content("Your offer on book '" + request.getTargetBook().getName() + "' has been accepted")
+                .content("Your offer on book '" + request.getTargetBook().getTitle() + "' has been accepted")
                 .href("transaction")
                 .build());
 
@@ -106,7 +106,7 @@ public class TransactionServiceImpl implements TransactionService {
                     // notify rejection
                     notificationService.sendNotification(Notification.builder()
                             .user(req.getBorrower())
-                            .content("Your offer on book '" + req.getTargetBook().getName() + "' has been rejected")
+                            .content("Your offer on book '" + req.getTargetBook().getTitle() + "' has been rejected")
                             .href("book/" + req.getTargetBook().getId())
                             .build());
                 });
@@ -129,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
         // notify user
         notificationService.sendNotification(Notification.builder()
                 .user(request.getBorrower())
-                .content("Your offer on book '" + request.getTargetBook().getName() + "' has been rejected")
+                .content("Your offer on book '" + request.getTargetBook().getTitle() + "' has been rejected")
                 .href("book/" + request.getTargetBook().getId())
                 .build());
     }

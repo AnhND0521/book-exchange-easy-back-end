@@ -30,7 +30,7 @@ public class BookRepositoryTest {
     void givenBooks_whenFindByAvailableStatusOrderByCreatedDesc_thenReturnAvailableBooksInDecreasingTimeOrder() {
         bookRepository.saveAll(IntStream.range(0, 20).mapToObj(i ->
                 Book.builder()
-                        .name("Book" + i)
+                        .title("Book" + i)
                         .author("Author" + i)
                         .created(RandomUtils.randomPastTime())
                         .status(BookStatus.AVAILABLE)
@@ -50,7 +50,7 @@ public class BookRepositoryTest {
         // given
         var books = IntStream.range(0, 20).mapToObj(i ->
                 Book.builder()
-                        .name("Book" + i)
+                        .title("Book" + i)
                         .author("Author" + i)
                         .created(RandomUtils.randomPastTime(4))
                         .status(BookStatus.AVAILABLE)

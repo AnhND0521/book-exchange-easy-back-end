@@ -46,7 +46,7 @@ class BookServiceTest {
     void givenValidBook_whenPostBook_thenBookIsSaved() {
         BookDTO bookDTO = BookDTO.builder()
                 .ownerId(1L)
-                .name("Book name")
+                .title("Book name")
                 .author("Author X")
                 .description("This is the description")
                 .build();
@@ -62,7 +62,7 @@ class BookServiceTest {
         Book book = Book.builder()
                 .id(1L)
                 .owner(user)
-                .name("Book name")
+                .title("Book name")
                 .author("Author X")
                 .description("This is the description")
                 .status(BookStatus.AVAILABLE)
@@ -80,7 +80,7 @@ class BookServiceTest {
         verify(bookRepository).save(bookArgumentCaptor.capture());
 
         Book capturedBook = bookArgumentCaptor.getValue();
-        assertThat(capturedBook.getName()).isEqualTo("Book name");
+        assertThat(capturedBook.getTitle()).isEqualTo("Book name");
         assertThat(capturedBook.getAuthor()).isEqualTo("Author X");
         assertThat(capturedBook.getStatus()).isEqualTo(BookStatus.AVAILABLE);
         assertThat(capturedBook.getOwner().getId()).isEqualTo(ownerId);
@@ -89,7 +89,7 @@ class BookServiceTest {
 
         assertThat(returned.getId()).isNotNull();
         assertThat(returned.getOwnerId()).isEqualTo(ownerId);
-        assertThat(returned.getName()).isEqualTo("Book name");
+        assertThat(returned.getTitle()).isEqualTo("Book name");
         assertThat(returned.getAuthor()).isEqualTo("Author X");
         assertThat(returned.getStatus()).isEqualTo("AVAILABLE");
     }
