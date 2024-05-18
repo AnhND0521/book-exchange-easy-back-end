@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StoreEventRepository extends JpaRepository<StoreEvent, Long> {
-    @Query("SELECT COUNT(u) FROM StoreEvent u WHERE YEAR(u.created) = ?1 AND MONTH(u.created) = ?2 AND DAY(u.created) = ?3")
-    Long countByDate(int year, int month, int date);
+    @Query("SELECT COUNT(u) FROM StoreEvent u WHERE YEAR(u.created) = ?1 AND MONTH(u.created) = ?2")
+    Long countByMonth(int year, int month);
 }

@@ -26,4 +26,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
     @Query("SELECT COUNT(t) FROM Transaction t WHERE YEAR(t.timestamp) = ?1 AND MONTH(t.timestamp) = ?2 AND DAY(t.timestamp) = ?3")
     Long countByDate(int year, int month, int date);
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE YEAR(t.timestamp) = ?1 AND MONTH(t.timestamp) = ?2")
+    Long countByMonth(int year, int month);
 }

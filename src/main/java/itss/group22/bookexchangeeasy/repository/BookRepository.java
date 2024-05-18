@@ -20,4 +20,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT COUNT(b) FROM Book b WHERE YEAR(b.created) = ?1 AND MONTH(b.created) = ?2 AND DAY(b.created) = ?3")
     Long countByDate(int year, int month, int date);
+    @Query("SELECT COUNT(b) FROM Book b WHERE YEAR(b.created) = ?1 AND MONTH(b.created) = ?2")
+    Long countByMonth(int year, int month);
 }
