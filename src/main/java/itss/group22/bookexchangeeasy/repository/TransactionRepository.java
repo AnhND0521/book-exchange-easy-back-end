@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -22,4 +23,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findByTargetBookId(Long bookId);
 
     long countByStatus(TransactionStatus status);
+
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE YEAR(t.timestamp) = ?1 AND MONTH(t.timestamp) = ?2 AND DAY(t.timestamp) = ?3")
+    Long countByDate(int year, int month, int date);
 }
