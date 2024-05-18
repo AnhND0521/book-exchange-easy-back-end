@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(u.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
     List<User> findByEmailOrName(String keyword, Pageable pageable);
+    @Query("SELECT COUNT(u) FROM User u WHERE YEAR(u.created) = ?1 AND MONTH(u.created) = ?2 AND DAY(u.created) = ?3")
+    Long countByDate(int year, int month, int date);
 }
