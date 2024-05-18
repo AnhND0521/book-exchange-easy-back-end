@@ -56,6 +56,7 @@ public class BookRepositoryTest {
                         .status(BookStatus.AVAILABLE)
                         .build()
         ).toList();
+        log.info(books.stream().map(Book::getCreated).toList().toString());
         bookRepository.saveAll(books);
         log.info(books.stream().map(Book::getCreated).toList().toString());
 
