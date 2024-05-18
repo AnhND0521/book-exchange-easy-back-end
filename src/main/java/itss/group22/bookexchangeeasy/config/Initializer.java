@@ -5,10 +5,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import itss.group22.bookexchangeeasy.entity.*;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
+import itss.group22.bookexchangeeasy.enums.ExchangeItemType;
+import itss.group22.bookexchangeeasy.enums.ExchangeOfferStatus;
 import itss.group22.bookexchangeeasy.enums.Gender;
 import itss.group22.bookexchangeeasy.repository.*;
+import itss.group22.bookexchangeeasy.service.TransactionService;
+import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.CreationTimestamp;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.boot.CommandLineRunner;
@@ -24,6 +29,7 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -41,15 +47,17 @@ public class Initializer {
     private final RoleRepository roleRepository;
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
-    private final ExchangeRequestRepository exchangeRequestRepository;
+    private final ExchangeOfferRepository exchangeOfferRepository;
+    private final TransactionRepository transactionRepository;
+    private final MoneyItemRepository moneyItemRepository;
     private final RestTemplate restTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final TransactionService transactionService;
     private Random random = new Random();
 
     @Bean
     public CommandLineRunner commandLineRunner() {
         return (args) -> {
-            generateBooks(50);
             if (addressUnitRepository.count() == 0) {
                 importSql("data/address_unit.sql");
             }
@@ -58,12 +66,19 @@ public class Initializer {
 //            }
             if (userRepository.count() == 0) {
 //                importSql("data/user_info.sql", "data/role.sql", "data/users_roles.sql");
+                importSql("data/role.sql");
                 generateUsers(50);
             }
             if (bookRepository.count() == 0) {
-                importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");
+//                importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");
                 generateCategories();
                 generateBooks(50);
+            }
+            if (exchangeOfferRepository.count() == 0) {
+                generateExchangeOffers(40);
+            }
+            if (transactionRepository.count() == 0) {
+                generateTransactions(20);
             }
         };
     }
@@ -193,6 +208,58 @@ public class Initializer {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void generateExchangeOffers(int number) {
+        var allUsers = userRepository.findAll();
+
+        exchangeOfferRepository.saveAll(IntStream.range(0, number).mapToObj(i -> {
+            User owner;
+            List<Book> ownerBooks;
+            do {
+                owner = allUsers.get(random.nextInt(allUsers.size()));
+            } while ((ownerBooks = bookRepository.findByOwnerIdAndStatus(owner.getId(), BookStatus.AVAILABLE)).isEmpty());
+
+            User borrower;
+            do {
+                borrower = allUsers.get(random.nextInt(allUsers.size()));
+            } while (borrower.getId().equals(owner.getId()));
+
+            Book targetBook = ownerBooks.get(random.nextInt(ownerBooks.size()));
+            List<Book> borrowerBooks;
+            ExchangeItemType exchangeItemType = (borrowerBooks = bookRepository.findByOwnerIdAndStatus(borrower.getId(), BookStatus.AVAILABLE)).isEmpty() ? ExchangeItemType.MONEY : ExchangeItemType.BOOK;
+            Book bookItem = null;
+            MoneyItem moneyItem = null;
+
+            if (exchangeItemType.equals(ExchangeItemType.BOOK)) {
+                bookItem = borrowerBooks.get(random.nextInt(borrowerBooks.size()));
+            } else {
+                moneyItem = MoneyItem.builder().amount((double) random.nextInt(200000)).unit("VND").build();
+                moneyItemRepository.save(moneyItem);
+            }
+            ExchangeOfferStatus status = ExchangeOfferStatus.PENDING;
+
+            return ExchangeOffer.builder()
+                    .owner(owner)
+                    .borrower(borrower)
+                    .targetBook(targetBook)
+                    .exchangeItemType(exchangeItemType)
+                    .bookItem(bookItem)
+                    .moneyItem(moneyItem)
+                    .status(status)
+                    .build();
+        }).toList());
+    }
+
+    private void generateTransactions(int number) {
+        var offers = exchangeOfferRepository.findByStatus(ExchangeOfferStatus.PENDING);
+        int count = 0;
+        while (count < number && offers.size() > 0) {
+            var chosenOffer = offers.get(random.nextInt(offers.size()));
+            transactionService.acceptRequest(chosenOffer.getTargetBook().getId(), chosenOffer.getId());
+            count++;
+            offers = exchangeOfferRepository.findByStatus(ExchangeOfferStatus.PENDING);
         }
     }
 }

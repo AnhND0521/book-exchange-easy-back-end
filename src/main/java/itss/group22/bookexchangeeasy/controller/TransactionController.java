@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.book.ExchangeRequestDTO;
+import itss.group22.bookexchangeeasy.dto.book.ExchangeOfferDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.service.TransactionService;
@@ -28,14 +28,14 @@ public class TransactionController {
                     "bookItem (cuốn sách dùng để trao đổi trong trường hợp đổi bằng sách) hoặc " +
                     "moneyItem (lượng tiền dùng để trao đổi trong trường hợp đổi bằng tiền)"
     )
-    public ResponseEntity<ResponseMessage> requestExchange(@PathVariable Long bookId, @RequestBody ExchangeRequestDTO requestDTO) {
+    public ResponseEntity<ResponseMessage> requestExchange(@PathVariable Long bookId, @RequestBody ExchangeOfferDTO requestDTO) {
         transactionService.requestExchange(bookId, requestDTO);
         return ResponseEntity.ok(new ResponseMessage("Request created successfully"));
     }
 
     @GetMapping("/books/{bookId}/requests")
     @Operation(summary = "Lấy danh sách tất cả yêu cầu trao đổi của một cuốn sách")
-    public ResponseEntity<List<ExchangeRequestDTO>> getRequestsOfBook(@PathVariable Long bookId) {
+    public ResponseEntity<List<ExchangeOfferDTO>> getRequestsOfBook(@PathVariable Long bookId) {
         return ResponseEntity.ok(transactionService.getRequestsOfBook(bookId));
     }
 

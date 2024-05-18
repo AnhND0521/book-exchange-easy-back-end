@@ -32,14 +32,14 @@ class BookServiceTest {
     @Mock
     private TransactionRepository transactionRepository;
     @Mock
-    private ExchangeRequestRepository exchangeRequestRepository;
+    private ExchangeOfferRepository exchangeOfferRepository;
     private ModelMapper mapper;
     private BookService bookService;
 
     @BeforeEach
     void setUp() {
         mapper = new ModelMapper();
-        bookService = new BookServiceImpl(userRepository, bookRepository, categoryRepository, transactionRepository, exchangeRequestRepository, mapper);
+        bookService = new BookServiceImpl(userRepository, bookRepository, categoryRepository, transactionRepository, exchangeOfferRepository, mapper);
     }
 
     @Test

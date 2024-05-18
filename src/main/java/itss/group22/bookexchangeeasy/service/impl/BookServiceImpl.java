@@ -28,7 +28,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
-    private final ExchangeRequestRepository exchangeRequestRepository;
+    private final ExchangeOfferRepository exchangeOfferRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -63,8 +63,8 @@ public class BookServiceImpl implements BookService {
         var transactions = transactionRepository.findByTargetBookId(bookId);
         transactionRepository.saveAll(transactions.stream().peek(transaction -> transaction.setTargetBook(null)).toList());
 
-        var requests = exchangeRequestRepository.findByTargetBookIdOrderByTimestampAsc(bookId);
-        exchangeRequestRepository.deleteAll(requests);
+        var requests = exchangeOfferRepository.findByTargetBookIdOrderByTimestampAsc(bookId);
+        exchangeOfferRepository.deleteAll(requests);
 
         book.setCategories(null);
         book = bookRepository.save(book);
