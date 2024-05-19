@@ -15,4 +15,5 @@ public interface BookService {
     List<BookDTO> getBookList(int page,int size);
     List<BookDTO> searchBook(String keyword,int page,int size);
     Long getExchangedBooks(LocalDateTime fromDate, LocalDateTime toDate);
+    Page<BookDTO> getBooksByUser(Long userId, int page, int size);
 }

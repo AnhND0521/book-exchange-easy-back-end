@@ -32,7 +32,7 @@ public class Post {
 
     private String imagePath;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "post_liked_users",
             joinColumns = @JoinColumn(name = "post_id"),

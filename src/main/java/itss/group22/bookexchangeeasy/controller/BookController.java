@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.BookService;
 import jakarta.validation.Valid;
@@ -80,5 +81,16 @@ public class BookController {
             @RequestParam(name = "size", required = false, defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(bookService.searchBook(keyword, page, size));
+    }
+
+
+    @GetMapping("/books/find-by-user")
+    @Operation(summary = "Lấy danh sách các cuốn sách mà một người dùng đăng (có phân trang)")
+    public ResponseEntity<Page<BookDTO>> getBooksByUser(
+            @RequestParam(name = "id", required = true) Long userId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(bookService.getBooksByUser(userId, page, size));
     }
 }

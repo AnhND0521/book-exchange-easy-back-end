@@ -105,6 +105,15 @@ public class BookServiceImpl implements BookService {
         return bookRepository.countByStatusAndCreatedBetween(exchangedStatus, fromDate, toDate);
     }
 
+    @Override
+    public Page getBooksByUser(Long userId, int page, int size) {
+        userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        return bookRepository
+                .findByUserOrderByTimestampDesc(userId, PageRequest.of(page, size))
+                .map(this::toDTO);
+    }
+
 
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())
