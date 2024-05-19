@@ -71,4 +71,34 @@ public class TransactionController {
     ) {
         return ResponseEntity.ok(transactionService.getTransactionsByUser(userId, page, size));
     }
+
+    @GetMapping("/transactions/{id}")
+    @Operation(summary = "Lấy thông tin chi tiết của một giao dịch")
+    public ResponseEntity<TransactionDTO> getTransactionDetails(@PathVariable String id) {
+        return ResponseEntity.ok(transactionService.getTransactionDetails(id));
+    }
+
+    @GetMapping("/transactions/search")
+    @Operation(summary = "Tìm kiếm giao dịch")
+    public ResponseEntity<Page<TransactionDTO>> searchTransactions(
+            @RequestParam(name = "q", required = true) String keyword,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+        return ResponseEntity.ok(transactionService.searchTransactions(keyword, page, size));
+    }
+
+    @PutMapping("/transactions/{id}/update-status")
+    @Operation(
+            summary = "Cập nhật trạng thái giao dịch",
+            description = "Giao dịch mang một trong các trạng thái 'CONFIRMED', 'DELIVERING', 'COMPLETED' hoặc 'CANCELLED'. " +
+                    "Nếu muốn đổi thành một trạng thái tùy ý thì điền tên trạng thái vào tham số value. " +
+                    "Nếu muốn tự động cập nhật thành trạng thái tiếp theo thì không cần điền tham số này"
+    )
+    public ResponseEntity<ResponseMessage> updateTransactionStatus(
+            @PathVariable String id,
+            @RequestParam(name = "value", required = false) String statusName
+    ) {
+        transactionService.updateTransactionStatus(id, statusName);
+        return ResponseEntity.ok(new ResponseMessage("Transaction status updated successfully"));
+    }
 }

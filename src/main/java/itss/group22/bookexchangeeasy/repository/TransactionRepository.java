@@ -30,4 +30,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     Long countByDate(int year, int month, int date);
     @Query("SELECT COUNT(t) FROM Transaction t WHERE YEAR(t.timestamp) = ?1 AND MONTH(t.timestamp) = ?2")
     Long countByMonth(int year, int month);
+
+    @Query("SELECT t FROM Transaction t " +
+            "WHERE t.id LIKE CONCAT('%', LOWER(?1), '%') " +
+            "OR LOWER(t.owner.email) LIKE CONCAT('%', LOWER(?1), '%') " +
+            "OR LOWER(t.borrower.email) LIKE CONCAT('%', LOWER(?1), '%') " +
+            "OR LOWER(t.targetBook.title) LIKE CONCAT('%', LOWER(?1), '%') " +
+            "ORDER BY t.timestamp DESC")
+    Page<Transaction> findByIdOrOwnerEmailOrBorrowerEmailOrBookTitleLike(String keyword, Pageable pageable);
 }

@@ -13,4 +13,7 @@ public interface TransactionService {
     void rejectOffer(Long bookId, Long offerId);
     Page<TransactionDTO> getTransactions(int page, int size);
     Page<TransactionDTO> getTransactionsByUser(Long userId, int page, int size);
+    TransactionDTO getTransactionDetails(String id);
+    Page<TransactionDTO> searchTransactions(String keyword, int page, int size);
+    void updateTransactionStatus(String id, String statusName);
 }

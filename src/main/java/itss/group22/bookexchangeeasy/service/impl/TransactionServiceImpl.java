@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -90,6 +91,11 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.getTargetBook().setStatus(BookStatus.EXCHANGED);
         bookRepository.save(transaction.getTargetBook());
 
+        if (transaction.getBookItem() != null) {
+            transaction.getBookItem().setStatus(BookStatus.EXCHANGED);
+            bookRepository.save(transaction.getBookItem());
+        }
+
         // notify acceptance
         notificationService.sendNotification(Notification.builder()
                 .user(offer.getBorrower())
@@ -150,6 +156,44 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository
                 .findByUserOrderByTimestampDesc(userId, PageRequest.of(page, size))
                 .map(this::toDTO);
+    }
+
+    @Override
+    public TransactionDTO getTransactionDetails(String id) {
+        var transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction", "id", id));
+        return toDTO(transaction);
+    }
+
+    @Override
+    public Page<TransactionDTO> searchTransactions(String keyword, int page, int size) {
+        return transactionRepository
+                .findByIdOrOwnerEmailOrBorrowerEmailOrBookTitleLike(keyword, PageRequest.of(page, size))
+                .map(this::toDTO);
+    }
+
+    @Override
+    public void updateTransactionStatus(String id, String statusName) {
+        var transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction", "id", id));
+
+        if (statusName != null) {
+            TransactionStatus status = TransactionStatus.valueOf(statusName);
+            transaction.setStatus(status);
+            transactionRepository.save(transaction);
+        } else {
+            var currentStatus = transaction.getStatus();
+            if (currentStatus.equals(TransactionStatus.COMPLETED) || currentStatus.equals(TransactionStatus.CANCELLED)) {
+                throw new ApiException("The transaction is already at its last status. You should explicitly specify the next status to update to");
+            }
+            var nextStatus = switch (currentStatus) {
+                case CONFIRMED -> TransactionStatus.DELIVERING;
+                case DELIVERING -> TransactionStatus.COMPLETED;
+                default -> null;
+            };
+            transaction.setStatus(nextStatus);
+            transactionRepository.save(transaction);
+        }
     }
 
     private ExchangeOffer toEntity(ExchangeOfferDTO offerDTO) {
