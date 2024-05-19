@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.book.ExchangeRequestDTO;
+import itss.group22.bookexchangeeasy.dto.book.ExchangeOfferDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.service.TransactionService;
@@ -18,7 +18,7 @@ import java.util.List;
 public class TransactionController {
     private final TransactionService transactionService;
 
-    @PostMapping("/books/{bookId}/requests")
+    @PostMapping("/books/{bookId}/offers")
     @Operation(
             summary = "Gửi yêu cầu trao đổi sách",
             description = "Các trường cần nhập gồm " +
@@ -28,29 +28,29 @@ public class TransactionController {
                     "bookItem (cuốn sách dùng để trao đổi trong trường hợp đổi bằng sách) hoặc " +
                     "moneyItem (lượng tiền dùng để trao đổi trong trường hợp đổi bằng tiền)"
     )
-    public ResponseEntity<ResponseMessage> requestExchange(@PathVariable Long bookId, @RequestBody ExchangeRequestDTO requestDTO) {
-        transactionService.requestExchange(bookId, requestDTO);
-        return ResponseEntity.ok(new ResponseMessage("Request created successfully"));
+    public ResponseEntity<ResponseMessage> offerExchange(@PathVariable Long bookId, @RequestBody ExchangeOfferDTO offerDTO) {
+        transactionService.offerExchange(bookId, offerDTO);
+        return ResponseEntity.ok(new ResponseMessage("Offer created successfully"));
     }
 
-    @GetMapping("/books/{bookId}/requests")
+    @GetMapping("/books/{bookId}/offers")
     @Operation(summary = "Lấy danh sách tất cả yêu cầu trao đổi của một cuốn sách")
-    public ResponseEntity<List<ExchangeRequestDTO>> getRequestsOfBook(@PathVariable Long bookId) {
-        return ResponseEntity.ok(transactionService.getRequestsOfBook(bookId));
+    public ResponseEntity<List<ExchangeOfferDTO>> getOffersOfBook(@PathVariable Long bookId) {
+        return ResponseEntity.ok(transactionService.getOffersOfBook(bookId));
     }
 
-    @PostMapping("/books/{bookId}/requests/{requestId}/accept")
+    @PostMapping("/books/{bookId}/offers/{offerId}/accept")
     @Operation(summary = "Chấp nhận một yêu cầu trao đôi")
-    public ResponseEntity<ResponseMessage> acceptRequest(@PathVariable Long bookId, @PathVariable Long requestId) {
-        transactionService.acceptRequest(bookId, requestId);
-        return ResponseEntity.ok(new ResponseMessage("Request accepted successfully"));
+    public ResponseEntity<ResponseMessage> acceptOffer(@PathVariable Long bookId, @PathVariable Long offerId) {
+        transactionService.acceptOffer(bookId, offerId);
+        return ResponseEntity.ok(new ResponseMessage("Offer accepted successfully"));
     }
 
-    @PostMapping("/books/{bookId}/requests/{requestId}/reject")
+    @PostMapping("/books/{bookId}/offers/{offerId}/reject")
     @Operation(summary = "Từ chối một yêu cầu trao đổi")
-    public ResponseEntity<ResponseMessage> rejectRequest(@PathVariable Long bookId, @PathVariable Long requestId) {
-        transactionService.rejectRequest(bookId, requestId);
-        return ResponseEntity.ok(new ResponseMessage("Request rejected successfully"));
+    public ResponseEntity<ResponseMessage> rejectOffer(@PathVariable Long bookId, @PathVariable Long offerId) {
+        transactionService.rejectOffer(bookId, offerId);
+        return ResponseEntity.ok(new ResponseMessage("Offer rejected successfully"));
     }
 
     @GetMapping("/transactions")
@@ -70,5 +70,35 @@ public class TransactionController {
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
     ) {
         return ResponseEntity.ok(transactionService.getTransactionsByUser(userId, page, size));
+    }
+
+    @GetMapping("/transactions/{id}")
+    @Operation(summary = "Lấy thông tin chi tiết của một giao dịch")
+    public ResponseEntity<TransactionDTO> getTransactionDetails(@PathVariable String id) {
+        return ResponseEntity.ok(transactionService.getTransactionDetails(id));
+    }
+
+    @GetMapping("/transactions/search")
+    @Operation(summary = "Tìm kiếm giao dịch")
+    public ResponseEntity<Page<TransactionDTO>> searchTransactions(
+            @RequestParam(name = "q", required = true) String keyword,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+        return ResponseEntity.ok(transactionService.searchTransactions(keyword, page, size));
+    }
+
+    @PutMapping("/transactions/{id}/update-status")
+    @Operation(
+            summary = "Cập nhật trạng thái giao dịch",
+            description = "Giao dịch mang một trong các trạng thái 'CONFIRMED', 'DELIVERING', 'COMPLETED' hoặc 'CANCELLED'. " +
+                    "Nếu muốn đổi thành một trạng thái tùy ý thì điền tên trạng thái vào tham số value. " +
+                    "Nếu muốn tự động cập nhật thành trạng thái tiếp theo thì không cần điền tham số này"
+    )
+    public ResponseEntity<ResponseMessage> updateTransactionStatus(
+            @PathVariable String id,
+            @RequestParam(name = "value", required = false) String statusName
+    ) {
+        transactionService.updateTransactionStatus(id, statusName);
+        return ResponseEntity.ok(new ResponseMessage("Transaction status updated successfully"));
     }
 }

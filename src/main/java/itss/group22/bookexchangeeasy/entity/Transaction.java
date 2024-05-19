@@ -23,7 +23,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @CreationTimestamp
     private LocalDateTime timestamp;
 
     @UpdateTimestamp
@@ -44,14 +43,19 @@ public class Transaction {
     @Enumerated
     private ExchangeItemType exchangeItemType;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "book_item_id")
-    private Book bookItem;  
+    private Book bookItem;
 
     @OneToOne
     @JoinColumn(name = "money_item_id")
     private MoneyItem moneyItem;
-    
+
     @Enumerated
     private TransactionStatus status;
+
+    @PrePersist
+    public void prePersist() {
+        if (timestamp == null) timestamp = LocalDateTime.now();
+    }
 }

@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.common.NotificationDTO;
 import itss.group22.bookexchangeeasy.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/users/{userId}/notifications")
+    @Operation(summary = "Lấy danh sách thông báo của một người dùng")
     public ResponseEntity<Page<NotificationDTO>> getNotifications(
             @PathVariable Long userId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,

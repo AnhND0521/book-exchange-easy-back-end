@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
+
 import itss.group22.bookexchangeeasy.dto.statistics.LineChartItem;
 import itss.group22.bookexchangeeasy.dto.statistics.OverviewStatistics;
 import itss.group22.bookexchangeeasy.dto.statistics.PieChartItem;
@@ -10,6 +11,7 @@ import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +25,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final StoreEventRepository storeEventRepository;
+
     @Override
     public OverviewStatistics getOverviewStatistics() {
         return OverviewStatistics.builder()
@@ -36,42 +39,50 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .eventsThisMonth(eventsThisMonth())
                 .build();
     }
-Long allBooks(){
-    return bookRepository.count();
-}
-    Long newBooksThisMonth(){
-        LocalDate today = LocalDate.now();
-        return  bookRepository.countByMonth(today.getYear(), today.getMonthValue());
+
+    Long allBooks() {
+        return bookRepository.count();
     }
-    Long allTransactions(){
+
+    Long newBooksThisMonth() {
+        LocalDate today = LocalDate.now();
+        return bookRepository.countByMonth(today.getYear(), today.getMonthValue());
+    }
+
+    Long allTransactions() {
         return transactionRepository.count();
     }
-    Long transactionsThisMonth(){
 
+    Long transactionsThisMonth() {
         LocalDate today = LocalDate.now();
-        return  transactionRepository.countByMonth(today.getYear(), today.getMonthValue());
+        return transactionRepository.countByMonth(today.getYear(), today.getMonthValue());
     }
-    Long allUsers(){
+
+    Long allUsers() {
         return userRepository.count();
     }
-    Long newUsersThisMonth(){
+
+    Long newUsersThisMonth() {
         LocalDate today = LocalDate.now();
-        return  userRepository.countByMonth(today.getYear(), today.getMonthValue());
+        return userRepository.countByMonth(today.getYear(), today.getMonthValue());
     }
-    Long allEvents(){
+
+    Long allEvents() {
         return storeEventRepository.count();
     }
-    Long eventsThisMonth(){
+
+    Long eventsThisMonth() {
         LocalDate today = LocalDate.now();
-        return  storeEventRepository.countByMonth(today.getYear(), today.getMonthValue());
+        return storeEventRepository.countByMonth(today.getYear(), today.getMonthValue());
     }
+
     @Override
     public List<PieChartItem> getTransactionPercentagesByStatus(String filterBy) {
         long allTransactions = transactionRepository.count();
         return Arrays.stream(TransactionStatus.values())
                 .map(status -> {
                     long countByStatus = transactionRepository.countByStatus(status);
-                    double percentage = (double) countByStatus / allTransactions;
+                    double percentage = 100.0 * countByStatus / allTransactions;
                     return new PieChartItem(status.name(), percentage);
                 }).toList();
     }

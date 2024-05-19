@@ -17,7 +17,7 @@ public class BookDTO {
     private Long id;
     private Long ownerId;
     @NotEmpty
-    private String name;
+    private String title;
     @NotEmpty
     private String author;
     private String publisher;

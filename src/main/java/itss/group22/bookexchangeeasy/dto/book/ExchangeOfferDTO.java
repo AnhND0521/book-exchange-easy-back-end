@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 
-public class ExchangeRequestDTO {
+public class ExchangeOfferDTO {
     private Long id;
     private Long userId;
     private Long bookId;

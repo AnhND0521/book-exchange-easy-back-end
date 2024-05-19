@@ -21,7 +21,7 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String title;
     private String author;
     private String publisher;
     private Integer publishYear;
@@ -50,6 +50,10 @@ public class Book {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @CreationTimestamp
     private LocalDateTime created;
+
+    @PrePersist
+    public void prePersist() {
+        if (created == null) created = LocalDateTime.now();
+    }
 }
