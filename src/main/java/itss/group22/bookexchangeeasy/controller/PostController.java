@@ -18,4 +18,5 @@ public class PostController {
     public ResponseEntity<PostDTO> postPost(@RequestBody PostDTO postDTO) {
        return ResponseEntity.ok(postService.postPost(postDTO))     ;
     }
+
 }
