@@ -64,6 +64,7 @@ public class BookController {
     }
 
     @GetMapping("")
+    @Operation(summary = "Lấy danh sách tất cả sách")
     private ResponseEntity<List<BookDTO>> getBookList(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "50") int size
@@ -79,13 +80,5 @@ public class BookController {
             @RequestParam(name = "size", required = false, defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(bookService.searchBook(keyword, page, size));
-    }
-
-    @GetMapping("/statistics/exchanged")
-    @Operation(summary = "Thống kê số lượng sách đã trao đổi theo ngày, tháng, quý, năm")
-    public ResponseEntity<Long> getExchangedBooks(
-                                                  @RequestParam(name = "from", required = false, defaultValue = "2024-01-01") LocalDateTime fromDate, // Today's date
-                                                  @RequestParam(name = "to", required = false, defaultValue = "2024-31-12") LocalDateTime toDate) {
-        return ResponseEntity.ok(bookService.getExchangedBooks(fromDate, toDate));
     }
 }

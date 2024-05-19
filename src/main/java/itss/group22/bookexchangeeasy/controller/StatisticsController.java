@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.controller;
+import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.statistics.LineChartItem;
 import itss.group22.bookexchangeeasy.dto.statistics.OverviewStatistics;
 import itss.group22.bookexchangeeasy.dto.statistics.PieChartItem;
@@ -20,11 +21,13 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
 
     @GetMapping("/overview")
+    @Operation(summary = "Lấy các thông số tổng quan")
     public ResponseEntity<OverviewStatistics> getOverviewStatistics() {
         return ResponseEntity.ok(statisticsService.getOverviewStatistics());
     }
 
     @GetMapping("/charts/transactions-by-status")
+    @Operation(summary = "Thống kê phần trăm giao dịch ở từng trạng thái")
     public ResponseEntity<List<PieChartItem>> getTransactionPercentagesByStatus(
             @RequestParam(name = "filter-by", required = false) String filterBy
     ) {
@@ -32,6 +35,7 @@ public class StatisticsController {
     }
 
     @GetMapping("/charts/new-books-by-date")
+    @Operation(summary = "Thống kê số sách mới theo từng ngày")
     public ResponseEntity<List<LineChartItem>> getNewBookCountByDate(
             @RequestParam(name = "from", required = false) LocalDate from,
             @RequestParam(name = "from", required = false) LocalDate to
@@ -40,6 +44,7 @@ public class StatisticsController {
     }
 
     @GetMapping("/charts/transactions-by-date")
+    @Operation(summary = "Thống kê số giao dịch theo từng ngày")
     public ResponseEntity<List<LineChartItem>> getTransactionCountByDate(
             @RequestParam(name = "from", required = false) LocalDate from,
             @RequestParam(name = "from", required = false) LocalDate to

@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.service.impl;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.entity.StoreEvent;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
+import itss.group22.bookexchangeeasy.repository.PostRepository;
 import itss.group22.bookexchangeeasy.repository.StoreEventRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.EventService;
@@ -15,6 +16,7 @@ public class EventServiceImpl implements EventService {
     private final ModelMapper mapper;
     private final UserRepository userRepository;
     private final StoreEventRepository eventRepository;
+    private final PostRepository postRepository;
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
         StoreEvent event = toEntity(eventDTO);
@@ -42,6 +44,7 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(Long id) {
         StoreEvent event  = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+        postRepository.deleteByEventId(event.getId());
         eventRepository.delete(event);
     }
 

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import itss.group22.bookexchangeeasy.entity.*;
-import itss.group22.bookexchangeeasy.enums.BookStatus;
-import itss.group22.bookexchangeeasy.enums.ExchangeItemType;
-import itss.group22.bookexchangeeasy.enums.ExchangeOfferStatus;
-import itss.group22.bookexchangeeasy.enums.Gender;
+import itss.group22.bookexchangeeasy.enums.*;
 import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +15,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,6 +32,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -53,6 +53,7 @@ public class Initializer {
     private final RestTemplate restTemplate;
     private final PasswordEncoder passwordEncoder;
     private final TransactionService transactionService;
+    private final TaskExecutor taskExecutor;
     private Random random = new Random();
 
     @Bean
@@ -64,30 +65,35 @@ public class Initializer {
 //            if (contactInfoRepository.count() == 0) {
 //                importSql("data/contact_info.sql");
 //            }
+            if (roleRepository.count() == 0) {
+                importSql("data/role.sql");
+            }
             if (userRepository.count() == 0) {
 //                importSql("data/user_info.sql", "data/role.sql", "data/users_roles.sql");
-                importSql("data/role.sql");
                 log.info("Generating users...");
                 generateUsers(50);
-                log.info("Generated users");
+                log.info("Done generating users");
+            }
+            if (categoryRepository.count() == 0) {
+                generateCategories();
             }
             if (bookRepository.count() == 0) {
 //                importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");
-                generateCategories();
                 log.info("Generating books...");
                 generateBooks(50);
-                log.info("Generated books");
+                log.info("Done generating books");
             }
             if (exchangeOfferRepository.count() == 0) {
                 log.info("Generating offers...");
                 generateExchangeOffers(40);
-                log.info("Generated offers");
+                log.info("Done generating offers");
             }
             if (transactionRepository.count() == 0) {
                 log.info("Generating transactions...");
                 generateTransactions(20);
-                log.info("Generated transactions");
+                log.info("Done generating transactions");
             }
+            log.info("Done generating data");
         };
     }
 
@@ -100,6 +106,7 @@ public class Initializer {
         }
     }
 
+    @Async
     private void generateUsers(int number) {
         // Admin
         userRepository.save(User.builder()
@@ -111,58 +118,64 @@ public class Initializer {
                 .isVerified(true)
                 .isLocked(false)
                 .roles(Set.of(roleRepository.findByName("ADMIN").get()))
-                .created(randomPastTime(6))
+                .created(randomPastTime(3))
                 .build());
 
+        CountDownLatch latch = new CountDownLatch(number);
         try {
             ResponseEntity<String> response = restTemplate.getForEntity("https://randomuser.me/api/?results=" + number, String.class);
             JsonNode root = new ObjectMapper().readTree(response.getBody());
-            for (var node : root.get("results")) {
-                String email = node.get("email").asText();
-                String password = email.substring(0, email.indexOf("@"));
-                String name = node.get("name").get("first").asText() + " " + node.get("name").get("last").asText();
-                Gender gender = node.get("gender").asText().matches("male|female")
-                        ? Gender.valueOf(node.get("gender").asText().toUpperCase())
-                        : Gender.OTHER;
-                LocalDate birthDate = LocalDate.parse(node.get("dob").get("date").asText().substring(0, 10));
+            for (var node : root.get("results"))
+                taskExecutor.execute(() -> {
+                    String email = node.get("email").asText();
+                    String password = email.substring(0, email.indexOf("@"));
+                    String name = node.get("name").get("first").asText() + " " + node.get("name").get("last").asText();
+                    Gender gender = node.get("gender").asText().matches("male|female")
+                            ? Gender.valueOf(node.get("gender").asText().toUpperCase())
+                            : Gender.OTHER;
+                    LocalDate birthDate = LocalDate.parse(node.get("dob").get("date").asText().substring(0, 10));
 
-                String phoneNumber = node.get("phone").asText().replaceAll("\\D", "");
-                var communes = addressUnitRepository.findByTypeOrderByNameAsc(3);
-                var commune = communes.get(random.nextInt(communes.size()));
-                var district = addressUnitRepository.findById(commune.getParentId()).get();
-                var province = addressUnitRepository.findById(district.getParentId()).get();
-                String detailedAddress = node.get("location").get("street").get("number").asInt() + " " + node.get("location").get("street").get("name").asText();
+                    String phoneNumber = node.get("phone").asText().replaceAll("\\D", "");
+                    var communes = addressUnitRepository.findByTypeOrderByNameAsc(3);
+                    var commune = communes.get(random.nextInt(communes.size()));
+                    var district = addressUnitRepository.findById(commune.getParentId()).get();
+                    var province = addressUnitRepository.findById(district.getParentId()).get();
+                    String detailedAddress = node.get("location").get("street").get("number").asInt() + " " + node.get("location").get("street").get("name").asText();
 
-                var contactInfo = ContactInfo.builder()
-                        .phoneNumber(phoneNumber)
-                        .province(province)
-                        .district(district)
-                        .commune(commune)
-                        .detailedAddress(detailedAddress)
-                        .build();
-                contactInfo = contactInfoRepository.save(contactInfo);
+                    var contactInfo = ContactInfo.builder()
+                            .phoneNumber(phoneNumber)
+                            .province(province)
+                            .district(district)
+                            .commune(commune)
+                            .detailedAddress(detailedAddress)
+                            .build();
+                    contactInfo = contactInfoRepository.save(contactInfo);
 
-                String pictureUrl = node.get("picture").get("large").asText();
-                Set<Role> roles = Set.of(random.nextInt(10) == 0
-                        ? roleRepository.findByName("BOOKSTORE").get()
-                        : roleRepository.findByName("BOOK_EXCHANGER").get());
+                    String pictureUrl = node.get("picture").get("large").asText();
+                    Set<Role> roles = Set.of(random.nextInt(10) == 0
+                            ? roleRepository.findByName("BOOKSTORE").get()
+                            : roleRepository.findByName("BOOK_EXCHANGER").get());
 
-                User user = User.builder()
-                        .email(email)
-                        .password(passwordEncoder.encode(password))
-                        .name(name)
-                        .gender(gender)
-                        .birthDate(birthDate)
-                        .contactInfo(contactInfo)
-                        .isVerified(true)
-                        .isLocked(false)
-                        .pictureUrl(pictureUrl)
-                        .roles(roles)
-                        .created(randomPastTime(6))
-                        .build();
-                userRepository.save(user);
-            }
-        } catch (JsonProcessingException e) {
+                    User user = User.builder()
+                            .email(email)
+                            .password(passwordEncoder.encode(password))
+                            .name(name)
+                            .gender(gender)
+                            .birthDate(birthDate)
+                            .contactInfo(contactInfo)
+                            .isVerified(true)
+                            .isLocked(false)
+                            .pictureUrl(pictureUrl)
+                            .roles(roles)
+                            .created(randomPastTime(3))
+                            .build();
+                    userRepository.save(user);
+                    log.info("Generated user %d/%d: %s".formatted(number - latch.getCount() + 1, number, name));
+                    latch.countDown();
+                });
+
+            latch.await();
+        } catch (JsonProcessingException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -172,55 +185,66 @@ public class Initializer {
         categoryRepository.saveAll(categories.stream().map(name -> Category.builder().name(name).build()).toList());
     }
 
+    @Async
     private void generateBooks(int number) {
         String rootUrl = "https://openlibrary.org";
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=oshi&limit=" + number, String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=ko&limit=" + number, String.class);
             JsonNode root = null;
             root = new ObjectMapper().readTree(response.getBody());
 
             var allCategories = categoryRepository.findAll();
             var allUsers = userRepository.findAll();
 
-            int count = 0;
-            for (var node : root.get("docs")) {
-                String title = node.get("title").asText();
-                String author = node.get("author_name") == null ? null : node.get("author_name").get(0).asText();
-                String publisher = node.get("publisher") == null ? null : node.get("publisher").get(random.nextInt(0, node.get("publisher").size())).asText();
-                Integer publishYear = node.get("publish_year") == null ? null : node.get("publish_year").get(random.nextInt(0, node.get("publish_year").size())).asInt();
-                String language = node.get("language") == null ? null : node.get("language").get(random.nextInt(0, node.get("language").size())).asText();
-                Integer pages = node.get("number_of_pages_median") == null ? null : node.get("number_of_pages_median").asInt();
-                String layout = List.of("Softcover", "Hardcover").get(random.nextInt(2));
-                String description = node.get("first_sentence") == null ? null : node.get("first_sentence").get(random.nextInt(node.get("first_sentence").size())).asText();
+//            int count = 0;
+            CountDownLatch latch = new CountDownLatch(number);
+            for (var node : root.get("docs"))
+                taskExecutor.execute(() -> {
+                    String title = node.get("title").asText();
+                    String author = node.get("author_name") == null ? null : node.get("author_name").get(0).asText();
+                    String publisher = node.get("publisher") == null ? null : node.get("publisher").get(random.nextInt(0, node.get("publisher").size())).asText();
+                    Integer publishYear = node.get("publish_year") == null ? null : node.get("publish_year").get(random.nextInt(0, node.get("publish_year").size())).asInt();
+                    String language = node.get("language") == null ? null : node.get("language").get(random.nextInt(0, node.get("language").size())).asText();
+                    Integer pages = node.get("number_of_pages_median") == null ? null : node.get("number_of_pages_median").asInt();
+                    String layout = List.of("Softcover", "Hardcover").get(random.nextInt(2));
+                    String description = node.get("first_sentence") == null ? null : node.get("first_sentence").get(random.nextInt(node.get("first_sentence").size())).asText();
 
-                // get cover image
-                String imagePath = null;
-                String bookUrl = rootUrl + node.get("seed").get(0).asText();
-                Document doc = Jsoup.connect(bookUrl).userAgent("Jsoup client").get();
-                var imageNode = doc.selectFirst("div[class~=cover] img");
-                if (imageNode != null) {
-                    imagePath = imageNode.attr("src");
-                    if (imagePath.startsWith("//")) imagePath = "https:" + imagePath;
-                    if (imagePath.endsWith("avatar_book.png")) imagePath = null;
-                }
+                    // get cover image
+                    String imagePath = null;
+                    try {
+                        String bookUrl = rootUrl + node.get("seed").get(0).asText();
+                        Document doc = Jsoup.connect(bookUrl).userAgent("Jsoup client").get();
+                        var imageNode = doc.selectFirst("div[class~=cover] img");
+                        if (imageNode != null) {
+                            imagePath = imageNode.attr("src");
+                            if (imagePath.startsWith("//")) imagePath = "https:" + imagePath;
+                            if (imagePath.endsWith("avatar_book.png")) imagePath = null;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-                List<Category> categories = IntStream.range(0, random.nextInt(1, 6))
-                        .mapToObj(allCategories::get)
-                        .collect(Collectors.toSet())
-                        .stream().toList();
+                    List<Category> categories = IntStream.range(0, random.nextInt(1, 6))
+                            .mapToObj(allCategories::get)
+                            .collect(Collectors.toSet())
+                            .stream().toList();
 
-                BookStatus status = BookStatus.AVAILABLE;
-                User owner = allUsers.get(random.nextInt(allUsers.size()));
-                var created = randomPastTime(6);
+                    BookStatus status = BookStatus.AVAILABLE;
+                    User owner = allUsers.get(random.nextInt(allUsers.size()));
+                    var created = randomPastTime(2);
 
-                bookRepository.save(new Book(null, title, author, publisher, publishYear,
-                        language, null, null, pages, layout, description,
-                        imagePath, categories, status, owner, created));
-                count++;
-                if (count % 10 == 0) log.info(count + "/" + number);
-            }
-        } catch (IOException e) {
+                    bookRepository.save(new Book(null, title, author, publisher, publishYear,
+                            language, null, null, pages, layout, description,
+                            imagePath, categories, status, owner, created));
+                    log.info("Generated book %d/%d: %s".formatted(number - latch.getCount() + 1, number, title));
+                    latch.countDown();
+//                count++;
+//                if (count % 10 == 0) log.info(count + "/" + number);
+                });
+
+            latch.await();
+        } catch (JsonProcessingException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -262,7 +286,7 @@ public class Initializer {
                     .bookItem(bookItem)
                     .moneyItem(moneyItem)
                     .status(status)
-                    .timestamp(randomPastTime(6))
+                    .timestamp(randomPastTime(2))
                     .build();
         }).toList());
     }
@@ -277,14 +301,15 @@ public class Initializer {
             offers = exchangeOfferRepository.findByStatus(ExchangeOfferStatus.PENDING);
         }
         transactionRepository.findAll().forEach(t -> {
-            t.setTimestamp(randomPastTime(6));
+            t.setTimestamp(randomPastTime(2));
+            t.setStatus(TransactionStatus.values()[random.nextInt(TransactionStatus.values().length)]);
             transactionRepository.save(t);
         });
     }
 
-    public static LocalDateTime randomPastTime(int monthsBefore) {
+    private LocalDateTime randomPastTime(int monthsBefore) {
         long minEpoch = LocalDateTime.now().minusMonths(monthsBefore).toEpochSecond(ZoneOffset.UTC) * 1000;
         long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(new Random().nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(random.nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
     }
 }

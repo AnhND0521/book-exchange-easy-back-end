@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.community.PostDTO;
 import itss.group22.bookexchangeeasy.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+
     @PostMapping("/posts")
+    @Operation(summary = "Đăng một bài đăng")
     public ResponseEntity<PostDTO> postPost(@RequestBody PostDTO postDTO) {
-       return ResponseEntity.ok(postService.postPost(postDTO))     ;
+        return ResponseEntity.ok(postService.postPost(postDTO));
     }
 }

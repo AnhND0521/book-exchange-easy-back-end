@@ -23,6 +23,7 @@ services:
       springboot-mysql-network:
     depends_on:
       - mysqldb
+    restart: on-failure
 #    restart: on-failure
 
 networks:
