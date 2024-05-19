@@ -22,7 +22,6 @@ public class ExchangeOffer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreationTimestamp
     private LocalDateTime timestamp;
 
     @ManyToOne
@@ -50,4 +49,9 @@ public class ExchangeOffer {
 
     @Enumerated
     private ExchangeOfferStatus status;
+
+    @PrePersist
+    public void prePersist() {
+        if (timestamp == null) timestamp = LocalDateTime.now();
+    }
 }

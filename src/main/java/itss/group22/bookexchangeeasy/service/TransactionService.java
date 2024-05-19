@@ -7,10 +7,10 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface TransactionService {
-    void requestExchange(Long bookId, ExchangeOfferDTO requestDTO);
-    List<ExchangeOfferDTO> getRequestsOfBook(Long bookId);
-    void acceptRequest(Long bookId, Long requestId);
-    void rejectRequest(Long bookId, Long requestId);
+    void offerExchange(Long bookId, ExchangeOfferDTO offerDTO);
+    List<ExchangeOfferDTO> getOffersOfBook(Long bookId);
+    void acceptOffer(Long bookId, Long offerId);
+    void rejectOffer(Long bookId, Long offerId);
     Page<TransactionDTO> getTransactions(int page, int size);
     Page<TransactionDTO> getTransactionsByUser(Long userId, int page, int size);
 }

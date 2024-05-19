@@ -50,6 +50,10 @@ public class Book {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @CreationTimestamp
     private LocalDateTime created;
+
+    @PrePersist
+    public void prePersist() {
+        if (created == null) created = LocalDateTime.now();
+    }
 }

@@ -82,7 +82,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return Arrays.stream(TransactionStatus.values())
                 .map(status -> {
                     long countByStatus = transactionRepository.countByStatus(status);
-                    double percentage = (double) countByStatus / allTransactions;
+                    double percentage = 100.0 * countByStatus / allTransactions;
                     return new PieChartItem(status.name(), percentage);
                 }).toList();
     }

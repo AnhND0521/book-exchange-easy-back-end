@@ -10,10 +10,8 @@ import itss.group22.bookexchangeeasy.enums.ExchangeOfferStatus;
 import itss.group22.bookexchangeeasy.enums.Gender;
 import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.TransactionService;
-import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.CreationTimestamp;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.boot.CommandLineRunner;
@@ -28,8 +26,10 @@ import org.springframework.web.client.RestTemplate;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -67,18 +67,26 @@ public class Initializer {
             if (userRepository.count() == 0) {
 //                importSql("data/user_info.sql", "data/role.sql", "data/users_roles.sql");
                 importSql("data/role.sql");
+                log.info("Generating users...");
                 generateUsers(50);
+                log.info("Generated users");
             }
             if (bookRepository.count() == 0) {
 //                importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");
                 generateCategories();
+                log.info("Generating books...");
                 generateBooks(50);
+                log.info("Generated books");
             }
             if (exchangeOfferRepository.count() == 0) {
+                log.info("Generating offers...");
                 generateExchangeOffers(40);
+                log.info("Generated offers");
             }
             if (transactionRepository.count() == 0) {
+                log.info("Generating transactions...");
                 generateTransactions(20);
+                log.info("Generated transactions");
             }
         };
     }
@@ -103,6 +111,7 @@ public class Initializer {
                 .isVerified(true)
                 .isLocked(false)
                 .roles(Set.of(roleRepository.findByName("ADMIN").get()))
+                .created(randomPastTime(6))
                 .build());
 
         try {
@@ -149,6 +158,7 @@ public class Initializer {
                         .isLocked(false)
                         .pictureUrl(pictureUrl)
                         .roles(roles)
+                        .created(randomPastTime(6))
                         .build();
                 userRepository.save(user);
             }
@@ -173,6 +183,7 @@ public class Initializer {
             var allCategories = categoryRepository.findAll();
             var allUsers = userRepository.findAll();
 
+            int count = 0;
             for (var node : root.get("docs")) {
                 String title = node.get("title").asText();
                 String author = node.get("author_name") == null ? null : node.get("author_name").get(0).asText();
@@ -201,10 +212,13 @@ public class Initializer {
 
                 BookStatus status = BookStatus.AVAILABLE;
                 User owner = allUsers.get(random.nextInt(allUsers.size()));
+                var created = randomPastTime(6);
 
                 bookRepository.save(new Book(null, title, author, publisher, publishYear,
                         language, null, null, pages, layout, description,
-                        imagePath, categories, status, owner, null));
+                        imagePath, categories, status, owner, created));
+                count++;
+                if (count % 10 == 0) log.info(count + "/" + number);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -248,6 +262,7 @@ public class Initializer {
                     .bookItem(bookItem)
                     .moneyItem(moneyItem)
                     .status(status)
+                    .timestamp(randomPastTime(6))
                     .build();
         }).toList());
     }
@@ -257,9 +272,19 @@ public class Initializer {
         int count = 0;
         while (count < number && offers.size() > 0) {
             var chosenOffer = offers.get(random.nextInt(offers.size()));
-            transactionService.acceptRequest(chosenOffer.getTargetBook().getId(), chosenOffer.getId());
+            transactionService.acceptOffer(chosenOffer.getTargetBook().getId(), chosenOffer.getId());
             count++;
             offers = exchangeOfferRepository.findByStatus(ExchangeOfferStatus.PENDING);
         }
+        transactionRepository.findAll().forEach(t -> {
+            t.setTimestamp(randomPastTime(6));
+            transactionRepository.save(t);
+        });
+    }
+
+    public static LocalDateTime randomPastTime(int monthsBefore) {
+        long minEpoch = LocalDateTime.now().minusMonths(monthsBefore).toEpochSecond(ZoneOffset.UTC) * 1000;
+        long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(new Random().nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
     }
 }

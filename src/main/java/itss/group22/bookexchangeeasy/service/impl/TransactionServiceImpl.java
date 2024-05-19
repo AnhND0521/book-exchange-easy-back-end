@@ -1,4 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
+
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.ExchangeOfferDTO;
 import itss.group22.bookexchangeeasy.dto.book.MoneyItemDTO;
@@ -19,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -34,33 +36,33 @@ public class TransactionServiceImpl implements TransactionService {
     private final ModelMapper mapper;
 
     @Override
-    public void requestExchange(Long bookId, ExchangeOfferDTO requestDTO) {
-        requestDTO.setBookId(bookId);
-        ExchangeOffer request = toEntity(requestDTO);
+    public void offerExchange(Long bookId, ExchangeOfferDTO offerDTO) {
+        offerDTO.setBookId(bookId);
+        ExchangeOffer offer = toEntity(offerDTO);
 
-        if (!request.getTargetBook().getStatus().equals(BookStatus.AVAILABLE))
+        if (!offer.getTargetBook().getStatus().equals(BookStatus.AVAILABLE))
             throw new ApiException("Book is not available");
 
-        request.setStatus(ExchangeOfferStatus.PENDING);
-        if (request.getBookItem() != null) {
-            bookRepository.save(request.getBookItem());
+        offer.setStatus(ExchangeOfferStatus.PENDING);
+        if (offer.getBookItem() != null) {
+            bookRepository.save(offer.getBookItem());
         }
-        if (request.getMoneyItem() != null) {
-            moneyItemRepository.save(request.getMoneyItem());
+        if (offer.getMoneyItem() != null) {
+            moneyItemRepository.save(offer.getMoneyItem());
         }
-        exchangeOfferRepository.save(request);
+        exchangeOfferRepository.save(offer);
 
         // notify owner
         notificationService.sendNotification(Notification.builder()
-                .user(request.getOwner())
-                .content("You've got a new offer on book '" + request.getTargetBook().getTitle()
-                        + "' from " + request.getBorrower().getName())
-                .href("book/" + request.getTargetBook().getId())
+                .user(offer.getOwner())
+                .content("You've got a new offer on book '" + offer.getTargetBook().getTitle()
+                        + "' from " + offer.getBorrower().getName())
+                .href("book/" + offer.getTargetBook().getId())
                 .build());
     }
 
     @Override
-    public List<ExchangeOfferDTO> getRequestsOfBook(Long bookId) {
+    public List<ExchangeOfferDTO> getOffersOfBook(Long bookId) {
         return exchangeOfferRepository.findByTargetBookIdOrderByTimestampAsc(bookId)
                 .stream()
                 .map(this::toDTO)
@@ -68,20 +70,20 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void acceptRequest(Long bookId, Long requestId) {
-        ExchangeOffer request = exchangeOfferRepository.findById(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Exchange request", "id", requestId));
+    public void acceptOffer(Long bookId, Long offerId) {
+        ExchangeOffer offer = exchangeOfferRepository.findById(offerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exchange offer", "id", offerId));
 
-        if (!request.getTargetBook().getId().equals(bookId))
-            throw new ApiException("Exchange request does not belong to specified book");
+        if (!offer.getTargetBook().getId().equals(bookId))
+            throw new ApiException("Exchange offer does not belong to specified book");
 
-        if (!request.getStatus().equals(ExchangeOfferStatus.PENDING))
-            throw new ApiException("Exchange request has already been handled");
+        if (!offer.getStatus().equals(ExchangeOfferStatus.PENDING))
+            throw new ApiException("Exchange offer has already been handled");
 
-        request.setStatus(ExchangeOfferStatus.ACCEPTED);
-        exchangeOfferRepository.save(request);
+        offer.setStatus(ExchangeOfferStatus.ACCEPTED);
+        exchangeOfferRepository.save(offer);
 
-        Transaction transaction = mapper.map(request, Transaction.class);
+        Transaction transaction = mapper.map(offer, Transaction.class);
         transaction.setStatus(TransactionStatus.CONFIRMED);
         transactionRepository.save(transaction);
 
@@ -90,16 +92,16 @@ public class TransactionServiceImpl implements TransactionService {
 
         // notify acceptance
         notificationService.sendNotification(Notification.builder()
-                .user(request.getBorrower())
-                .content("Your offer on book '" + request.getTargetBook().getTitle() + "' has been accepted")
+                .user(offer.getBorrower())
+                .content("Your offer on book '" + offer.getTargetBook().getTitle() + "' has been accepted")
                 .href("transaction")
                 .build());
 
-        // auto reject other requests
+        // auto reject other offers
         exchangeOfferRepository
                 .findByTargetBookIdOrderByTimestampAsc(bookId)
                 .forEach(req -> {
-                    if (req.getId().equals(requestId)) return;
+                    if (req.getId().equals(offerId)) return;
                     req.setStatus(ExchangeOfferStatus.REJECTED);
                     exchangeOfferRepository.save(req);
 
@@ -113,24 +115,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void rejectRequest(Long bookId, Long requestId) {
-        ExchangeOffer request = exchangeOfferRepository.findById(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Exchange request", "id", requestId));
+    public void rejectOffer(Long bookId, Long offerId) {
+        ExchangeOffer offer = exchangeOfferRepository.findById(offerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exchange offer", "id", offerId));
 
-        if (!request.getTargetBook().getId().equals(bookId))
-            throw new ApiException("Exchange request does not belong to specified book");
+        if (!offer.getTargetBook().getId().equals(bookId))
+            throw new ApiException("Exchange offer does not belong to specified book");
 
-        if (!request.getStatus().equals(ExchangeOfferStatus.PENDING))
-            throw new ApiException("Exchange request has already been handled");
+        if (!offer.getStatus().equals(ExchangeOfferStatus.PENDING))
+            throw new ApiException("Exchange offer has already been handled");
 
-        request.setStatus(ExchangeOfferStatus.REJECTED);
-        exchangeOfferRepository.save(request);
+        offer.setStatus(ExchangeOfferStatus.REJECTED);
+        exchangeOfferRepository.save(offer);
 
         // notify user
         notificationService.sendNotification(Notification.builder()
-                .user(request.getBorrower())
-                .content("Your offer on book '" + request.getTargetBook().getTitle() + "' has been rejected")
-                .href("book/" + request.getTargetBook().getId())
+                .user(offer.getBorrower())
+                .content("Your offer on book '" + offer.getTargetBook().getTitle() + "' has been rejected")
+                .href("book/" + offer.getTargetBook().getId())
                 .build());
     }
 
@@ -150,21 +152,26 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(this::toDTO);
     }
 
-    private ExchangeOffer toEntity(ExchangeOfferDTO requestDTO) {
-        Book targetBook = bookRepository.findById(requestDTO.getBookId())
-                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", requestDTO.getBookId()));
-        User borrower = userRepository.findById(requestDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", requestDTO.getUserId()));
+    private ExchangeOffer toEntity(ExchangeOfferDTO offerDTO) {
+        Book targetBook = bookRepository.findById(offerDTO.getBookId())
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", offerDTO.getBookId()));
+        User borrower = userRepository.findById(offerDTO.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", offerDTO.getUserId()));
         User owner = targetBook.getOwner();
-        ExchangeItemType exchangeItemType = ExchangeItemType.valueOf(requestDTO.getExchangeItemType());
+        ExchangeItemType exchangeItemType = ExchangeItemType.valueOf(offerDTO.getExchangeItemType());
         Book bookItem = null;
         MoneyItem moneyItem = null;
         if (exchangeItemType == ExchangeItemType.BOOK) {
-            bookItem = mapper.map(requestDTO.getBookItem(), Book.class);
-            bookItem.setOwner(borrower);
-            bookItem.setStatus(BookStatus.EXCHANGED);
+            if (offerDTO.getBookItem().getId() != null) {
+                bookItem = bookRepository.findById(offerDTO.getBookItem().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Book", "id", offerDTO.getBookItem().getId()));
+            } else {
+                bookItem = mapper.map(offerDTO.getBookItem(), Book.class);
+                bookItem.setOwner(borrower);
+                bookItem.setStatus(BookStatus.EXCHANGED);
+            }
         } else {
-            moneyItem = mapper.map(requestDTO.getMoneyItem(), MoneyItem.class);
+            moneyItem = mapper.map(offerDTO.getMoneyItem(), MoneyItem.class);
         }
         return ExchangeOffer.builder()
                 .owner(owner)
@@ -176,16 +183,16 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
     }
 
-    private ExchangeOfferDTO toDTO(ExchangeOffer request) {
+    private ExchangeOfferDTO toDTO(ExchangeOffer offer) {
         return ExchangeOfferDTO.builder()
-                .id(request.getId())
-                .userId(request.getBorrower().getId())
-                .bookId(request.getTargetBook().getId())
-                .exchangeItemType(request.getExchangeItemType().name())
-                .bookItem(request.getBookItem() == null ? null : mapper.map(request.getBookItem(), BookDTO.class))
-                .moneyItem(request.getMoneyItem() == null ? null : mapper.map(request.getMoneyItem(), MoneyItemDTO.class))
-                .status(request.getStatus().name())
-                .timestamp(request.getTimestamp())
+                .id(offer.getId())
+                .userId(offer.getBorrower().getId())
+                .bookId(offer.getTargetBook().getId())
+                .exchangeItemType(offer.getExchangeItemType().name())
+                .bookItem(offer.getBookItem() == null ? null : mapper.map(offer.getBookItem(), BookDTO.class))
+                .moneyItem(offer.getMoneyItem() == null ? null : mapper.map(offer.getMoneyItem(), MoneyItemDTO.class))
+                .status(offer.getStatus().name())
+                .timestamp(offer.getTimestamp())
                 .build();
     }
 

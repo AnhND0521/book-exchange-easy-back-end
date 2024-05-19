@@ -23,7 +23,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @CreationTimestamp
     private LocalDateTime timestamp;
 
     @UpdateTimestamp
@@ -54,4 +53,9 @@ public class Transaction {
 
     @Enumerated
     private TransactionStatus status;
+
+    @PrePersist
+    public void prePersist() {
+        if (timestamp == null) timestamp = LocalDateTime.now();
+    }
 }

@@ -56,11 +56,15 @@ public class User implements UserDetails {
     @ToString.Exclude
     private Set<Role> roles;
 
-    @CreationTimestamp
     private LocalDateTime created;
 
     @UpdateTimestamp
     private LocalDateTime lastUpdated;
+
+    @PrePersist
+    public void prePersist() {
+        if (created == null) created = LocalDateTime.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
