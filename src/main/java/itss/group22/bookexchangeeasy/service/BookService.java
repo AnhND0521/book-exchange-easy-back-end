@@ -1,6 +1,7 @@
 package itss.group22.bookexchangeeasy.service;
 
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -16,4 +17,5 @@ public interface BookService {
     List<BookDTO> searchBook(String keyword,int page,int size);
     Long getExchangedBooks(LocalDateTime fromDate, LocalDateTime toDate);
     Page<BookDTO> getBooksByUser(Long userId, int page, int size);
+    List<CategoryDTO> listByCategories(Integer categories, Integer booksPerCategory);
 }

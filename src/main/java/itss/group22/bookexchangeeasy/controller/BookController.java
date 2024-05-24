@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
 import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.BookService;
@@ -64,7 +65,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBookDetails(bookId));
     }
 
-    @GetMapping("")
+    @GetMapping("/books")
     @Operation(summary = "Lấy danh sách tất cả sách")
     private ResponseEntity<List<BookDTO>> getBookList(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -73,7 +74,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBookList(page, size));
     }
 
-    @GetMapping("/search")
+    @GetMapping("/books/search")
     @Operation(summary = "Tìm kiếm sách")
     private ResponseEntity<List<BookDTO>> searchBook(
             @RequestParam(name = "q") String keyword,
@@ -84,7 +85,7 @@ public class BookController {
     }
 
 
-    @GetMapping("/books/find-by-user")
+    @GetMapping("books/find-by-user")
     @Operation(summary = "Lấy danh sách các cuốn sách mà một người dùng đăng (có phân trang)")
     public ResponseEntity<Page<BookDTO>> getBooksByUser(
             @RequestParam(name = "id", required = true) Long userId,
@@ -92,5 +93,14 @@ public class BookController {
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
     ) {
         return ResponseEntity.ok(bookService.getBooksByUser(userId, page, size));
+    }
+
+    @GetMapping("/books/list-by-categories")
+    @Operation(summary = "Liệt kê sách theo từng thể loại")
+    public ResponseEntity<List<CategoryDTO>> listByCategories(
+            @RequestParam(name = "categories", required = false, defaultValue = "5") Integer categories,
+            @RequestParam(name = "books-per-category", required = false, defaultValue = "20") Integer booksPerCategories
+    ) {
+        return ResponseEntity.ok(bookService.listByCategories(categories, booksPerCategories));
     }
 }

@@ -23,6 +23,7 @@ public class UserProfile {
     private AddressUnitDTO district;
     private AddressUnitDTO commune;
     private String detailedAddress;
+    private String pictureUrl;
 
     public boolean hasContactInfo() {
         return phoneNumber != null || province != null || district != null || commune != null || detailedAddress != null;

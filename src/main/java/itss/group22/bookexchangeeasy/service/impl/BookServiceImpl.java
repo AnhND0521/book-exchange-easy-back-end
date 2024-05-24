@@ -1,6 +1,7 @@
 package itss.group22.bookexchangeeasy.service.impl;
 
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
+import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
 import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.Category;
 import itss.group22.bookexchangeeasy.entity.User;
@@ -106,14 +107,28 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page getBooksByUser(Long userId, int page, int size) {
+    public Page<BookDTO> getBooksByUser(Long userId, int page, int size) {
         userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         return bookRepository
-                .findByUserOrderByTimestampDesc(userId, PageRequest.of(page, size))
+                .findByOwnerIdOrderByCreatedDesc(userId, PageRequest.of(page, size))
                 .map(this::toDTO);
     }
 
+    @Override
+    public List<CategoryDTO> listByCategories(Integer categories, Integer booksPerCategory) {
+        return categoryRepository.findTopBookCategories(categories)
+                .stream()
+                .map(result -> {
+                    Category category = (Category) result[0];
+                    Page<Book> books = bookRepository.findByCategoryId(category.getId(), PageRequest.of(0, booksPerCategory));
+                    return CategoryDTO.builder()
+                            .id(category.getId())
+                            .categoryName(category.getName())
+                            .books(books.map(this::toDTO).toList())
+                            .build();
+                }).toList();
+    }
 
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())

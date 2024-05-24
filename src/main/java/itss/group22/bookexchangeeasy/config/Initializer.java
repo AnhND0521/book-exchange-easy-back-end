@@ -93,7 +93,7 @@ public class Initializer {
                 generateTransactions(20);
                 log.info("Done generating transactions");
             }
-            log.info("Done generating data");
+            log.info("Done preparing data");
         };
     }
 

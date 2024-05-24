@@ -1,7 +1,6 @@
 package itss.group22.bookexchangeeasy.repository;
 
 import itss.group22.bookexchangeeasy.entity.Book;
-import itss.group22.bookexchangeeasy.entity.Transaction;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +28,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT COUNT(b) FROM Book b WHERE YEAR(b.created) = ?1 AND MONTH(b.created) = ?2")
     Long countByMonth(int year, int month);
 
-    @Query("SELECT b FROM Book b " +
-            "WHERE b.owner.id = ?1 " +
-            "ORDER BY b.created DESC")
-    Page<Book> findByUserOrderByTimestampDesc(Long userId, Pageable pageable);
+    Page<Book> findByOwnerIdOrderByCreatedDesc(Long ownerId, Pageable pageable);
+
+    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = ?1 ORDER BY RAND()")
+    Page<Book> findByCategoryId(Long categoryId, Pageable pageable);
 }
