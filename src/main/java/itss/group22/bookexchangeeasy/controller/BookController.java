@@ -83,7 +83,7 @@ public class BookController {
     ) {
         return ResponseEntity.ok(bookService.searchBook(keyword, page, size));
     }
-    @GetMapping("/books/search")
+    @GetMapping("/books/search-sort-by-author")
     @Operation(summary = "Tìm kiếm sách sắp xếp theo tên tác giả")
     private ResponseEntity<Page<BookDTO>> searchBookSortByAuthor(
             @RequestParam(name = "q") String keyword,
@@ -93,7 +93,7 @@ public class BookController {
         return ResponseEntity.ok((Page<BookDTO>) bookService.searchBookSortByAuthor(keyword, page, size));
     }
 
-    @GetMapping("/books/search")
+    @GetMapping("/books/search-sort-by-title")
     @Operation(summary = "Tìm kiếm sách sắp xếp theo tên sach")
     private ResponseEntity<Page<BookDTO>> searchBookSortByTitle(
             @RequestParam(name = "q") String keyword,
