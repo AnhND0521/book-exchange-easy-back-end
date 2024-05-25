@@ -46,6 +46,8 @@ public class ExchangeOffer {
     @JoinColumn(name = "money_item_id")
     private MoneyItem moneyItem;
 
+    private String message;
+
     @Enumerated
     private ExchangeOfferStatus status;
 

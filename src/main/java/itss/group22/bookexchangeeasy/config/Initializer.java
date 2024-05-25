@@ -71,7 +71,7 @@ public class Initializer {
             if (userRepository.count() == 0) {
 //                importSql("data/user_info.sql", "data/role.sql", "data/users_roles.sql");
                 log.info("Generating users...");
-                generateUsers(50);
+                generateUsers(20);
                 log.info("Done generating users");
             }
             if (categoryRepository.count() == 0) {
@@ -80,17 +80,17 @@ public class Initializer {
             if (bookRepository.count() == 0) {
 //                importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");
                 log.info("Generating books...");
-                generateBooks(50);
+                generateBooks(100);
                 log.info("Done generating books");
             }
             if (exchangeOfferRepository.count() == 0) {
                 log.info("Generating offers...");
-                generateExchangeOffers(40);
+                generateExchangeOffers(50);
                 log.info("Done generating offers");
             }
             if (transactionRepository.count() == 0) {
                 log.info("Generating transactions...");
-                generateTransactions(20);
+                generateTransactions(30);
                 log.info("Done generating transactions");
             }
             log.info("Done preparing data");
@@ -190,7 +190,7 @@ public class Initializer {
         String rootUrl = "https://openlibrary.org";
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=ko&limit=" + number, String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=anata+no&limit=" + number, String.class);
             JsonNode root = null;
             root = new ObjectMapper().readTree(response.getBody());
 
