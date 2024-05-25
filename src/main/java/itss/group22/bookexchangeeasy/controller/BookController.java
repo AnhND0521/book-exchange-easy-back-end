@@ -83,7 +83,25 @@ public class BookController {
     ) {
         return ResponseEntity.ok(bookService.searchBook(keyword, page, size));
     }
+    @GetMapping("/books/search")
+    @Operation(summary = "Tìm kiếm sách sắp xếp theo tên tác giả")
+    private ResponseEntity<Page<BookDTO>> searchBookSortByAuthor(
+            @RequestParam(name = "q") String keyword,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "50") int size
+    ) {
+        return ResponseEntity.ok((Page<BookDTO>) bookService.searchBookSortByAuthor(keyword, page, size));
+    }
 
+    @GetMapping("/books/search")
+    @Operation(summary = "Tìm kiếm sách sắp xếp theo tên sach")
+    private ResponseEntity<Page<BookDTO>> searchBookSortByTitle(
+            @RequestParam(name = "q") String keyword,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "50") int size
+    ) {
+        return ResponseEntity.ok((Page<BookDTO>) bookService.searchBookSortByTitle(keyword, page, size));
+    }
 
     @GetMapping("books/find-by-user")
     @Operation(summary = "Lấy danh sách các cuốn sách mà một người dùng đăng (có phân trang)")

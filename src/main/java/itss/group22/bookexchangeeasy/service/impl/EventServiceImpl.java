@@ -8,11 +8,9 @@ import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
@@ -51,12 +49,29 @@ public class EventServiceImpl implements EventService {
         eventRepository.delete(event);
     }
 
+    @Override
+    public Page<EventDTO> getLatestEvents(int page, int size) {
+        return eventRepository.findAllByOrderByCreatedDesc(PageRequest.of(page, size)).map(this::toDTO);
+    }
+
+    @Override
+    public Page<EventDTO> getEventsByOwner(Long userId, int page, int size) {
+        userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        return eventRepository.findByUserOrderByCreatedDesc(userId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
+    @Override
+    public Page<EventDTO> getEventsByConcernedUser(Long userId, int page, int size) {
+        return eventRepository.findByConcernedUsersOrderByStartTimeDesc(userId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
 
     private EventDTO toDTO(StoreEvent event) {
         EventDTO eventDTO = mapper.map(event, EventDTO.class);
         eventDTO.setOwnerId(event.getOwner().getId());
-        eventDTO.setConcernedUserIds(event.getConcernedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
-
+        if(event.getConcernedUsers() != null){
+            eventDTO.setConcernedUserIds(event.getConcernedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
+        }
         return eventDTO;
     }
     private StoreEvent toEntity(EventDTO eventDTO) {
