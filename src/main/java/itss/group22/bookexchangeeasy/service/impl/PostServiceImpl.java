@@ -23,6 +23,7 @@ public class PostServiceImpl implements PostService {
     public PostDTO postPost(PostDTO postDTO) {
         Post post = toEntity(postDTO);
         post.setId(null);
+
         post.setLikedUsers(null);
         post = postRepository.save(post);
         return toDTO(post);

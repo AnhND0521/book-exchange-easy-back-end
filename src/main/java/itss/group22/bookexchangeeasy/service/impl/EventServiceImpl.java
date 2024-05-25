@@ -9,6 +9,10 @@ import itss.group22.bookexchangeeasy.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
@@ -21,9 +25,8 @@ public class EventServiceImpl implements EventService {
     public EventDTO createEvent(EventDTO eventDTO) {
         StoreEvent event = toEntity(eventDTO);
         event.setId(null);
-        event.setConcernedUsers(null);
         event = eventRepository.save(event);
-        return toDTO(event);
+            return toDTO(event);
     }
 
     @Override
@@ -60,7 +63,10 @@ public class EventServiceImpl implements EventService {
         StoreEvent event = mapper.map(eventDTO, StoreEvent.class);
         event.setOwner(userRepository.findById(eventDTO.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", eventDTO.getOwnerId())));
-        event.setConcernedUsers(eventDTO.getConcernedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toSet()));
+        if(eventDTO.getConcernedUserIds() != null) {
+            event.setConcernedUsers(eventDTO.getConcernedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toSet()));
+        }
+
         return event;
     }
 }
