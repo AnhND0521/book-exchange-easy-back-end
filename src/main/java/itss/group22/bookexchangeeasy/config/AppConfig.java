@@ -24,7 +24,7 @@ public class AppConfig {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(16);  // Adjust core pool size as needed
         executor.setMaxPoolSize(50);   // Adjust max pool size as needed
-        executor.setQueueCapacity(100); // Adjust queue capacity as needed
+        executor.setQueueCapacity(200); // Adjust queue capacity as needed
         executor.setThreadNamePrefix("async-task-");
         executor.initialize();
         return executor;

@@ -30,6 +30,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findByOwnerIdOrderByCreatedDesc(Long ownerId, Pageable pageable);
 
-    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = ?1 ORDER BY RAND()")
-    Page<Book> findByCategoryId(Long categoryId, Pageable pageable);
+    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = ?1 AND b.status = ?2 ORDER BY RAND()")
+    Page<Book> findByCategoryIdAndStatus(Long categoryId, BookStatus status, Pageable pageable);
 }

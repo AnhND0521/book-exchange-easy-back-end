@@ -19,6 +19,7 @@ public class ExchangeOfferDTO {
     private String exchangeItemType;
     private BookDTO bookItem;
     private MoneyItemDTO moneyItem;
+    private String message;
     private String status;
     private LocalDateTime timestamp;
 }

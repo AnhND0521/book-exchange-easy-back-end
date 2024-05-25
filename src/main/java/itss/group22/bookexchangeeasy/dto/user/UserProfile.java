@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserProfile {
+    private Long id;
     private String email;
     private String name;
     private String gender;
