@@ -75,7 +75,9 @@ public class PostServiceImpl implements PostService {
     private PostDTO toDTO(Post post) {
         PostDTO postDTO = mapper.map(post, PostDTO.class);
         postDTO.setUserId(post.getUser().getId());
-        postDTO.setLikedUserIds(post.getLikedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
+        if(post.getLikedUsers()!=null){
+            postDTO.setLikedUserIds(post.getLikedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
+        }
         if(post.getEvent() != null){
             postDTO.setEventId(post.getEvent().getId());
         }
@@ -85,7 +87,9 @@ public class PostServiceImpl implements PostService {
         Post post = mapper.map(postDTO, Post.class);
         post.setUser(userRepository.findById(postDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", postDTO.getUserId())));
-        post.setLikedUsers(postDTO.getLikedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toSet()));
+        if(postDTO.getLikedUserIds() != null){
+            post.setLikedUsers(postDTO.getLikedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toSet()));
+        }
         if(postDTO.getEventId() != null){
             post.setEvent(eventRepository.findById(postDTO.getEventId())
                     .orElseThrow(() -> new ResourceNotFoundException("Event", "id", postDTO.getEventId())));
