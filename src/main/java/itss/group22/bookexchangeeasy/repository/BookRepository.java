@@ -1,13 +1,10 @@
 package itss.group22.bookexchangeeasy.repository;
-
-import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,17 +14,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllByOrderByCreatedDesc(Pageable pageable);
 
     @Query("SELECT b FROM Book b WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', ?1, '%'))")
-    List<Book> findByTitleOrAuthor(String keyword, Pageable pageable);
+    Page<Book> findByTitleOrAuthor(String keyword, Pageable pageable);
 
     @Query("SELECT b FROM Book b " +
-            "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', ?1, '%')) " +
+            "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', ?1, '%')) AND b.status = ?2 " +
             "ORDER BY b.author DESC") // Sort by author descending
-    Page<Book> findByAuthorDESC(String keyword, Pageable pageable);
+    Page<Book> findByAuthorDESC(String keyword,BookStatus status, Pageable pageable);
 
     @Query("SELECT b FROM Book b " +
-            "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', ?1, '%')) " +
+            "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', ?1, '%')) AND b.status = ?2 " +
             "ORDER BY b.title DESC") // Sort by title descending
-    Page<Book> findByTitleDesc(String keyword, Pageable pageable);
+    Page<Book> findByTitleDesc(String keyword, BookStatus status,Pageable pageable);
 
     List<Book> findByOwnerIdAndStatus(Long ownerId, BookStatus status);
 

@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
+import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.EventService;
@@ -64,6 +65,12 @@ public class EventController {
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
     ) {
         return ResponseEntity.ok(eventService.getEventsByConcernedUser(userId, page, size));
+    }
+
+    @GetMapping("/events/{eventId}")
+    @Operation(summary = "Lấy thông tin một sự kiện cụ thể")
+    public ResponseEntity<EventDTO> getEventDetails(@PathVariable Long eventId) {
+        return ResponseEntity.ok(eventService.getEventDetails(eventId));
     }
 
 

@@ -76,7 +76,7 @@ public class BookController {
 
     @GetMapping("/books/search")
     @Operation(summary = "Tìm kiếm sách")
-    private ResponseEntity<List<BookDTO>> searchBook(
+    private ResponseEntity<Page<BookDTO>> searchBook(
             @RequestParam(name = "q") String keyword,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "50") int size

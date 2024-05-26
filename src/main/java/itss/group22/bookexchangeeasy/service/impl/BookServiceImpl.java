@@ -94,10 +94,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDTO> searchBook(String keyword, int page, int size) {
-        return bookRepository.findByTitleOrAuthor(keyword, PageRequest.of(page, size)).stream()
-                .map(this::toDTO)
-                .toList();
+    public Page<BookDTO> searchBook(String keyword, int page, int size) {
+        Page<Book> books = bookRepository.findByTitleOrAuthor(keyword, PageRequest.of(page, size));
+        return books.map(this::toDTO);
     }
 
     @Override
@@ -132,16 +131,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<BookDTO> searchBookSortByAuthor(String keyword, int page, int size) {
-        return (Page<BookDTO>) bookRepository.findByAuthorDESC(keyword, PageRequest.of(page, size)).stream()
-                .map(this::toDTO)
-                .toList();
+        Page<Book> books = bookRepository.findByAuthorDESC(keyword,BookStatus.AVAILABLE ,PageRequest.of(page, size));
+        return books.map(this::toDTO);
     }
 
     @Override
     public Page<BookDTO> searchBookSortByTitle(String keyword, int page, int size) {
-        return (Page<BookDTO>) bookRepository.findByTitleDesc(keyword, PageRequest.of(page, size)).stream()
-                .map(this::toDTO)
-                .toList();
+        Page<Book> books = bookRepository.findByTitleDesc(keyword,BookStatus.AVAILABLE ,PageRequest.of(page, size));
+        return books.map(this::toDTO);
     }
 
     private Book toEntity(BookDTO bookDTO) {

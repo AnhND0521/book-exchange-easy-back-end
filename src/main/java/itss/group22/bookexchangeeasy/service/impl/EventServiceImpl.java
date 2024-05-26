@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.service.impl;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
+import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.StoreEvent;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.PostRepository;
@@ -63,6 +64,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public Page<EventDTO> getEventsByConcernedUser(Long userId, int page, int size) {
         return eventRepository.findByConcernedUsersOrderByStartTimeDesc(userId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
+    @Override
+    public EventDTO getEventDetails(Long eventId) {
+        StoreEvent event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", "id",eventId));
+        return toDTO(event);
     }
 
 

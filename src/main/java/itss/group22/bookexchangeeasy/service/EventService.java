@@ -9,6 +9,7 @@ public interface EventService {
     Page<EventDTO> getLatestEvents(int page, int size);
     Page<EventDTO> getEventsByOwner(Long userId, int page, int size);
     Page<EventDTO> getEventsByConcernedUser(Long userId, int page, int size);
+    EventDTO getEventDetails(Long eventId);
 
 
 }
