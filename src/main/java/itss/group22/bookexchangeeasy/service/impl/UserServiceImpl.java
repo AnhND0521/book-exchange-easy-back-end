@@ -15,6 +15,7 @@ import itss.group22.bookexchangeeasy.repository.AddressUnitRepository;
 import itss.group22.bookexchangeeasy.repository.ContactInfoRepository;
 import itss.group22.bookexchangeeasy.repository.RoleRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
+import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import itss.group22.bookexchangeeasy.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +25,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final ContactInfoRepository contactInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${app.secret-key}")
     private String secretKey;
@@ -241,6 +246,15 @@ public class UserServiceImpl implements UserService {
 
         user.setIsLocked(false);
         userRepository.save(user);
+    }
+
+    @Override
+    public String uploadAvatar(Long id, MultipartFile imageFile) throws IOException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        Map data =  cloudinaryService.uploadFile(imageFile);
+        user.setPictureUrl(data.get("url").toString());
+        return data.get("url").toString();
     }
 
     private UserProfile buildProfile(User user) {
