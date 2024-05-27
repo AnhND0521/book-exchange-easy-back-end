@@ -5,10 +5,7 @@ import itss.group22.bookexchangeeasy.dto.book.ExchangeOfferDTO;
 import itss.group22.bookexchangeeasy.dto.book.MoneyItemDTO;
 import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.entity.*;
-import itss.group22.bookexchangeeasy.enums.BookStatus;
-import itss.group22.bookexchangeeasy.enums.ExchangeItemType;
-import itss.group22.bookexchangeeasy.enums.ExchangeOfferStatus;
-import itss.group22.bookexchangeeasy.enums.TransactionStatus;
+import itss.group22.bookexchangeeasy.enums.*;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.*;
@@ -21,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -59,12 +55,13 @@ public class TransactionServiceImpl implements TransactionService {
                 .content("You've got a new offer on book '" + offer.getTargetBook().getTitle()
                         + "' from " + offer.getBorrower().getName())
                 .href("book/" + offer.getTargetBook().getId())
+                .type(NotificationType.INFORMATION)
                 .build());
     }
 
     @Override
     public List<ExchangeOfferDTO> getOffersOfBook(Long bookId) {
-        return exchangeOfferRepository.findByTargetBookIdOrderByTimestampAsc(bookId)
+        return exchangeOfferRepository.findByTargetBookIdAndStatusOrderByTimestampAsc(bookId, ExchangeOfferStatus.PENDING)
                 .stream()
                 .map(this::toDTO)
                 .toList();
@@ -101,11 +98,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .user(offer.getBorrower())
                 .content("Your offer on book '" + offer.getTargetBook().getTitle() + "' has been accepted")
                 .href("transaction")
+                .type(NotificationType.SUCCESS)
                 .build());
 
         // auto reject other offers
         exchangeOfferRepository
-                .findByTargetBookIdOrderByTimestampAsc(bookId)
+                .findByTargetBookIdAndStatusOrderByTimestampAsc(bookId, ExchangeOfferStatus.PENDING)
                 .forEach(req -> {
                     if (req.getId().equals(offerId)) return;
                     req.setStatus(ExchangeOfferStatus.REJECTED);
@@ -116,6 +114,7 @@ public class TransactionServiceImpl implements TransactionService {
                             .user(req.getBorrower())
                             .content("Your offer on book '" + req.getTargetBook().getTitle() + "' has been rejected")
                             .href("book/" + req.getTargetBook().getId())
+                            .type(NotificationType.ERROR)
                             .build());
                 });
     }
@@ -139,6 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .user(offer.getBorrower())
                 .content("Your offer on book '" + offer.getTargetBook().getTitle() + "' has been rejected")
                 .href("book/" + offer.getTargetBook().getId())
+                .type(NotificationType.ERROR)
                 .build());
     }
 

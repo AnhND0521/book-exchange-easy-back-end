@@ -17,4 +17,6 @@ public class NotificationDTO {
     private String content;
     private LocalDateTime timestamp;
     private String href;
+    private Boolean isRead = false;
+    private String type;
 }

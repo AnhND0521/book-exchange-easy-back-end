@@ -85,7 +85,7 @@ public class Initializer {
             }
             if (exchangeOfferRepository.count() == 0) {
                 log.info("Generating offers...");
-                generateExchangeOffers(50);
+                generateExchangeOffers(100);
                 log.info("Done generating offers");
             }
             if (transactionRepository.count() == 0) {
@@ -190,7 +190,7 @@ public class Initializer {
         String rootUrl = "https://openlibrary.org";
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=anata+no&limit=" + number, String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=artificial+intelligence&limit=" + number, String.class);
             JsonNode root = null;
             root = new ObjectMapper().readTree(response.getBody());
 

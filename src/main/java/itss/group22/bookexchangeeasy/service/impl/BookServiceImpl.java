@@ -195,7 +195,7 @@ public class BookServiceImpl implements BookService {
         dto.setStatus(book.getStatus().name());
         dto.setCategories(book.getCategories().stream().map(Category::getName).toList());
         if(book.getConcernedUsers() != null){
-            dto.setConcernedUserIds(book.getConcernedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
+            dto.setConcernedUserIds(book.getConcernedUsers().stream().map(User::getId).collect(Collectors.toSet()));
         }
         return dto;
     }

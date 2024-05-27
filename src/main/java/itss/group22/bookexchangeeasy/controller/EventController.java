@@ -39,7 +39,7 @@ public class EventController {
 
     @GetMapping("/events/latest")
     @Operation(
-            summary = "Lấy những sự kiện được đăng  gần đây nhất (có phân trang)"
+            summary = "Lấy những sự kiện được đăng gần đây nhất (có phân trang)"
     )
     public ResponseEntity<Page<EventDTO>> getLatestEvents(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,

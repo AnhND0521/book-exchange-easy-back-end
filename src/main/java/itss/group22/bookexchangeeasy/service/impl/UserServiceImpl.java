@@ -252,10 +252,12 @@ public class UserServiceImpl implements UserService {
     public String uploadAvatar(Long id, MultipartFile imageFile) throws IOException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
         Map data =  cloudinaryService.uploadFile(imageFile);
-        user.setPictureUrl(data.get("url").toString());
+        String pictureUrl = data.get("url").toString();
+        user.setPictureUrl(pictureUrl);
         userRepository.save(user);
-        return data.get("url").toString();
+        return pictureUrl;
     }
 
     private UserProfile buildProfile(User user) {

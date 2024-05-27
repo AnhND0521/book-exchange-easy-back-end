@@ -42,6 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
     private NotificationDTO toDTO(Notification notification) {
         var dto = mapper.map(notification, NotificationDTO.class);
         dto.setUserId(notification.getUser().getId());
+        dto.setType(notification.getType().toString());
         return dto;
     }
 }
