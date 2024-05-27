@@ -37,9 +37,9 @@ public class PostController {
             summary = "Cập nhật bài đăng",
             description = "Body tương tự đăng sự kiện. Không cần điền các trường id và created."
     )
-    public ResponseEntity<ResponseMessage> updatePost(@PathVariable Long postId, @RequestBody @Valid PostDTO postDTO) {
+    public ResponseEntity<PostDTO> updatePost(@PathVariable Long postId, @RequestBody @Valid PostDTO postDTO) {
         postService.updatePost(postId, postDTO);
-        return ResponseEntity.ok(new ResponseMessage("Post updated successfully"));
+        return ResponseEntity.ok(postService.updatePost(postId, postDTO));
     }
 
     @DeleteMapping("/posts/{postId}")

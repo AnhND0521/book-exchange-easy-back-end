@@ -57,7 +57,7 @@ public class EventController {
     ) {
         return ResponseEntity.ok(eventService.getEventsByOwner(userId, page, size));
     }
-    @GetMapping("/events/filter event that user concern")
+    @GetMapping("/events/filter-event-that-user-concern")
     @Operation(summary = "Lấy danh sách tất cả các sự kiện mà một người dùng có quan tâm (có phân trang)")
     public ResponseEntity<Page<EventDTO>> getEventsByUserConcern(
             @RequestParam(name = "id", required = true) Long userId,

@@ -115,7 +115,7 @@ public class BookController {
     }
 
 
-    @GetMapping("/books/filter books that user concern")
+    @GetMapping("/books/filter-books-that-user-concerned")
     @Operation(summary = "Lấy danh sách tất cả các sách mà một người dùng có quan tâm (có phân trang)")
     public ResponseEntity<Page<BookDTO>> getBooksByConcernedUser(
             @RequestParam(name = "id", required = true) Long userId,

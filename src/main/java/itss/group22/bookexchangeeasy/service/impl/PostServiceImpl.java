@@ -35,7 +35,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void updatePost(Long postId, PostDTO postDTO) {
+    public PostDTO updatePost(Long postId, PostDTO postDTO) {
         Post post =postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
         postDTO.setUserId(post.getUser().getId());
@@ -43,6 +43,7 @@ public class PostServiceImpl implements PostService {
         post = toEntity(postDTO);
         post.setId(postId);
         postRepository.save(post);
+        return toDTO(post);
     }
 
     @Override
