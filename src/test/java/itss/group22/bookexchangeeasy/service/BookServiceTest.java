@@ -35,11 +35,12 @@ class BookServiceTest {
     private ExchangeOfferRepository exchangeOfferRepository;
     private ModelMapper mapper;
     private BookService bookService;
+    private CloudinaryService cloudinaryService;
 
     @BeforeEach
     void setUp() {
         mapper = new ModelMapper();
-        bookService = new BookServiceImpl(userRepository, bookRepository, categoryRepository, transactionRepository, exchangeOfferRepository, mapper);
+        bookService = new BookServiceImpl(userRepository, bookRepository, categoryRepository, transactionRepository, exchangeOfferRepository, mapper,cloudinaryService);
     }
 
     @Test

@@ -1,16 +1,22 @@
 package itss.group22.bookexchangeeasy.service.impl;
 import itss.group22.bookexchangeeasy.dto.community.PostDTO;
+import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.Post;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.PostRepository;
 import itss.group22.bookexchangeeasy.repository.StoreEventRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
+import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import itss.group22.bookexchangeeasy.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
@@ -19,6 +25,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final StoreEventRepository eventRepository;
     private final PostRepository postRepository;
+    private final CloudinaryService cloudinaryService;
     @Override
     public PostDTO postPost(PostDTO postDTO) {
         Post post = toEntity(postDTO);
@@ -71,6 +78,16 @@ public class PostServiceImpl implements PostService {
         return postRepository
                 .findByEventOrderByTimestampDesc(eventId, PageRequest.of(page, size))
                 .map(this::toDTO);
+    }
+
+    @Override
+    public String uploadPostImage(Long id, MultipartFile imageFile) throws IOException {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+        Map data =  cloudinaryService.uploadFile(imageFile);
+        post.setImagePath(data.get("url").toString());
+        postRepository.save(post);
+        return data.get("url").toString();
     }
 
     private PostDTO toDTO(Post post) {

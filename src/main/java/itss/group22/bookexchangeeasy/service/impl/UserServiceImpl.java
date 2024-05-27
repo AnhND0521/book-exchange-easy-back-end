@@ -254,6 +254,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         Map data =  cloudinaryService.uploadFile(imageFile);
         user.setPictureUrl(data.get("url").toString());
+        userRepository.save(user);
         return data.get("url").toString();
     }
 

@@ -10,6 +10,7 @@ import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.BookService;
+import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -17,9 +18,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,7 @@ public class BookServiceImpl implements BookService {
     private final TransactionRepository transactionRepository;
     private final ExchangeOfferRepository exchangeOfferRepository;
     private final ModelMapper mapper;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public BookDTO postBook(BookDTO bookDTO) {
@@ -145,6 +150,16 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookDTO> getBooksByConcernedUser(Long userId, int page, int size) {
         return bookRepository.findByConcernedUsersOrderByStartTimeDesc(userId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
+    @Override
+    public String uploadBookImage(Long id, MultipartFile imageFile) throws IOException {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", id));
+        Map data =  cloudinaryService.uploadFile(imageFile);
+        book.setImagePath(data.get("url").toString());
+        bookRepository.save(book);
+        return data.get("url").toString();
     }
 
     private Book toEntity(BookDTO bookDTO) {

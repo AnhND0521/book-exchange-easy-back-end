@@ -44,6 +44,7 @@ public class UserController {
     }
 
     @PostMapping("/{id}/upload-avatar")
+    @Operation(summary = "Upload ảnh đại diện của người dùng")
     private ResponseEntity<ResponseMessage> uploadAvatar(@PathVariable Long id, @RequestParam  MultipartFile imageFile) throws IOException {
         return ResponseEntity.ok(new ResponseMessage(userService.uploadAvatar(id, imageFile)));
     }

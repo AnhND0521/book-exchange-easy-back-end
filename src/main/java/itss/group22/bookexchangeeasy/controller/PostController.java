@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -65,6 +68,11 @@ public class PostController {
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
     ) {
         return ResponseEntity.ok(postService.getPostsByEvent(eventId, page, size));
+    }
+    @PostMapping("/{postId}/upload-image-post")
+    @Operation(summary = "Upload ảnh của post")
+    private ResponseEntity<ResponseMessage> uploadPostImage(@PathVariable Long id, @RequestParam MultipartFile imageFile) throws IOException {
+        return ResponseEntity.ok(new ResponseMessage(postService.uploadPostImage(id, imageFile)));
     }
 
 }

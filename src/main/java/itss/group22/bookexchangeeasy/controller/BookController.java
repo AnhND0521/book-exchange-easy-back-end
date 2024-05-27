@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -132,6 +134,12 @@ public class BookController {
             @RequestParam(name = "books-per-category", required = false, defaultValue = "20") Integer booksPerCategories
     ) {
         return ResponseEntity.ok(bookService.listByCategories(categories, booksPerCategories));
+    }
+
+    @PostMapping("/{bookId}/upload-image-book")
+    @Operation(summary = "Upload ảnh của sách")
+    private ResponseEntity<ResponseMessage> uploadBookImage(@PathVariable Long id, @RequestParam MultipartFile imageFile) throws IOException {
+        return ResponseEntity.ok(new ResponseMessage(bookService.uploadBookImage(id, imageFile)));
     }
 
 }

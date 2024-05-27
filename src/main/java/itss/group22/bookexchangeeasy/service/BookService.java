@@ -3,7 +3,9 @@ package itss.group22.bookexchangeeasy.service;
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,4 +24,5 @@ public interface BookService {
     Page<BookDTO> searchBookSortByAuthor(String keyword,int page,int size);
     Page<BookDTO> searchBookSortByTitle(String keyword,int page,int size);
     Page<BookDTO> getBooksByConcernedUser(Long userId, int page, int size);
+    String uploadBookImage(Long id, MultipartFile imageFile) throws IOException;
 }
