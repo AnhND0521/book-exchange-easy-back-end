@@ -12,6 +12,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public void deleteEvent(Long id) {
         StoreEvent event  = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));

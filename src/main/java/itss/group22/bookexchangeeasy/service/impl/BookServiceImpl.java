@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -141,6 +142,11 @@ public class BookServiceImpl implements BookService {
         return books.map(this::toDTO);
     }
 
+    @Override
+    public Page<BookDTO> getBooksByConcernedUser(Long userId, int page, int size) {
+        return bookRepository.findByConcernedUsersOrderByStartTimeDesc(userId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
     private Book toEntity(BookDTO bookDTO) {
         User user = userRepository.findById(bookDTO.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", bookDTO.getOwnerId()));
@@ -161,6 +167,9 @@ public class BookServiceImpl implements BookService {
                     }).toList();
             book.setCategories(categories);
         }
+        if(bookDTO.getConcernedUserIds() != null) {
+            book.setConcernedUsers(bookDTO.getConcernedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toList()));
+        }
 
         return book;
     }
@@ -170,6 +179,9 @@ public class BookServiceImpl implements BookService {
         dto.setOwnerId(book.getOwner().getId());
         dto.setStatus(book.getStatus().name());
         dto.setCategories(book.getCategories().stream().map(Category::getName).toList());
+        if(book.getConcernedUsers() != null){
+            dto.setConcernedUserIds(book.getConcernedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
+        }
         return dto;
     }
 

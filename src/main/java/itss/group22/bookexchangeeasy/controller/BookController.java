@@ -5,6 +5,7 @@ import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
 import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -113,6 +114,17 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBooksByUser(userId, page, size));
     }
 
+
+    @GetMapping("/books/filter books that user concern")
+    @Operation(summary = "Lấy danh sách tất cả các sách mà một người dùng có quan tâm (có phân trang)")
+    public ResponseEntity<Page<BookDTO>> getBooksByConcernedUser(
+            @RequestParam(name = "id", required = true) Long userId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(bookService.getBooksByConcernedUser(userId, page, size));
+    }
+
     @GetMapping("/books/list-by-categories")
     @Operation(summary = "Liệt kê sách theo từng thể loại")
     public ResponseEntity<List<CategoryDTO>> listByCategories(
@@ -121,4 +133,5 @@ public class BookController {
     ) {
         return ResponseEntity.ok(bookService.listByCategories(categories, booksPerCategories));
     }
+
 }

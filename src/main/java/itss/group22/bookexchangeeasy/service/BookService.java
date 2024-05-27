@@ -21,4 +21,5 @@ public interface BookService {
 
     Page<BookDTO> searchBookSortByAuthor(String keyword,int page,int size);
     Page<BookDTO> searchBookSortByTitle(String keyword,int page,int size);
+    Page<BookDTO> getBooksByConcernedUser(Long userId, int page, int size);
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -32,4 +33,5 @@ public class BookDTO {
     private List<String> categories;
     private String status;
     private LocalDateTime created;
+    private Set<Long> concernedUserIds;
 }

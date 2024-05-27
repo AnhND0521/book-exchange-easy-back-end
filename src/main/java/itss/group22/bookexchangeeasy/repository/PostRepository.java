@@ -12,7 +12,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query("DELETE FROM Post p WHERE p.event.id = ?1")
-    List<Post> deleteByEventId(Long eventId);
+    void deleteByEventId(Long eventId);
     Page<Post> findAllByOrderByCreatedDesc(Pageable pageable);
     @Query("SELECT p FROM Post p " +
             "WHERE p.user.id = ?1 " +

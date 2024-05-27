@@ -63,7 +63,7 @@ public class Initializer {
                 importSql("data/address_unit.sql");
             }
 //            if (contactInfoRepository.count() == 0) {
-//                importSql("data/contact_info.sql");
+//                importSql("data/contact_info.sql");itss.group22.bookexchangeeasy.enums.ExchangeItemType
 //            }
             if (roleRepository.count() == 0) {
                 importSql("data/role.sql");
@@ -232,11 +232,21 @@ public class Initializer {
 
                     BookStatus status = BookStatus.AVAILABLE;
                     User owner = allUsers.get(random.nextInt(allUsers.size()));
+                    List<User> concernUser = null;
+                    while (concernUser.size() < 10) {
+                        int randomIndex = random.nextInt(allUsers.size());
+                        User randomUser = allUsers.get(randomIndex);
+
+                        if (!concernUser.contains(randomUser)) {
+                            concernUser.add(randomUser);
+                        }
+                    }
+
                     var created = randomPastTime(2);
 
                     bookRepository.save(new Book(null, title, author, publisher, publishYear,
                             language, null, null, pages, layout, description,
-                            imagePath, categories, status, owner, created));
+                            imagePath, categories, status, owner, created,concernUser));
                     log.info("Generated book %d/%d: %s".formatted(number - latch.getCount() + 1, number, title));
                     latch.countDown();
 //                count++;

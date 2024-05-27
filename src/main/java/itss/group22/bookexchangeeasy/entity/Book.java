@@ -33,7 +33,6 @@ public class Book {
     @Column(name = "description", length = 1000)
     private String description;
     private String imagePath;
-
     @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "books_categories",
@@ -41,7 +40,6 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> categories;
-
     @Enumerated
     private BookStatus status;
 
@@ -50,6 +48,14 @@ public class Book {
     private User owner;
 
     private LocalDateTime created;
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "books_users_concerned",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> concernedUsers;
+
 
     @PrePersist
     public void prePersist() {
