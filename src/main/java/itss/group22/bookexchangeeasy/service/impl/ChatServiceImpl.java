@@ -13,8 +13,10 @@ import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.ChatService;
 import itss.group22.bookexchangeeasy.service.datastructure.OnlineUserSet;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +28,21 @@ public class ChatServiceImpl implements ChatService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final OnlineUserSet onlineUserSet;
+    private final ModelMapper mapper;
 
     @Override
     public Page<ChatConversationDTO> getConversations(Long userId, int page, int size) {
         return conversationRepository.findByUser(userId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
+    @Override
+    public ChatConversationDTO findConversationByPartner(Long userId, Long partnerId) {
+        var conversation = conversationRepository.findByUsers(userId, partnerId)
+                .orElseThrow(() -> new ApiException(
+                        "Chat conversation not found between user '%d' and user '%d'".formatted(userId, partnerId),
+                        HttpStatus.NOT_FOUND
+                ));
+        return toDTO(conversation);
     }
 
     @Override
@@ -40,7 +53,23 @@ public class ChatServiceImpl implements ChatService {
         if (!conversation.getUser1().getId().equals(userId) && !conversation.getUser2().getId().equals(userId))
             throw new ApiException("Conversation does not belong to this user");
 
-        return messageRepository.findByConversationId(conversationId, PageRequest.of(page, size)).map(this::toDTO);
+        return messageRepository.findByConversationIdOrderByTimestampDesc(conversationId, PageRequest.of(page, size)).map(this::toDTO);
+    }
+
+    @Override
+    public void markConversationAsSeen(Long userId, Long conversationId) {
+        var conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chat conversation", "id", conversationId));
+
+        if (!conversation.getUser1().getId().equals(userId) && !conversation.getUser2().getId().equals(userId))
+            throw new ApiException("Conversation does not belong to this user");
+
+        if (conversation.getUser1().getId().equals(userId)) {
+            conversation.setSeenByUser1(true);
+        } else {
+            conversation.setSeenByUser2(true);
+        }
+        conversationRepository.save(conversation);
     }
 
     @Override
@@ -80,6 +109,13 @@ public class ChatServiceImpl implements ChatService {
 
         // update conversation timestamp
         conversation.setLastMessageTime(message.getTimestamp());
+        if (message.getSender().getId().equals(conversation.getUser1().getId())) {
+            conversation.setSeenByUser1(true);
+            conversation.setSeenByUser2(false);
+        } else {
+            conversation.setSeenByUser1(false);
+            conversation.setSeenByUser2(true);
+        }
         conversationRepository.save(conversation);
 
         // forward message through websocket
@@ -91,14 +127,17 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private ChatConversationDTO toDTO(ChatConversation conversation) {
-        return ChatConversationDTO.builder()
-                .id(conversation.getId())
-                .user1_id(conversation.getUser1().getId())
-                .user1_name(conversation.getUser1().getName())
-                .user2_id(conversation.getUser2().getId())
-                .user2_name(conversation.getUser2().getName())
-                .lastMessageTime(conversation.getLastMessageTime())
-                .build();
+        var dto = mapper.map(conversation, ChatConversationDTO.class);
+        dto.setUserId1(conversation.getUser1().getId());
+        dto.setUserId2(conversation.getUser2().getId());
+        dto.setUserName1(conversation.getUser1().getName());
+        dto.setUserName2(conversation.getUser2().getName());
+        var lastMessage = messageRepository.findLastChatMessageOfConversation(conversation.getId());
+        lastMessage.ifPresent(message -> {
+            dto.setLastMessageContent(message.getContent());
+            dto.setLastSentByUser1(message.getSender().getId().equals(conversation.getUser1().getId()));
+        });
+        return dto;
     }
 
     private ChatMessageDTO toDTO(ChatMessage message) {
