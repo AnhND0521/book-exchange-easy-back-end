@@ -53,6 +53,20 @@ public class TransactionController {
         return ResponseEntity.ok(new ResponseMessage("Offer rejected successfully"));
     }
 
+    @PostMapping("/books/{bookId}/offers/accept-earliest")
+    @Operation(summary = "Chấp nhận yêu cầu trao đổi sớm nhất")
+    public ResponseEntity<ResponseMessage> acceptEarliestOffer(@PathVariable Long bookId) {
+        transactionService.acceptEarliestOffer(bookId);
+        return ResponseEntity.ok(new ResponseMessage("Earliest offer accepted successfully"));
+    }
+
+    @PostMapping("/books/{bookId}/offers/reject-all")
+    @Operation(summary = "Từ chối tất cả yêu cầu trao đổi")
+    public ResponseEntity<ResponseMessage> rejectAllOffers(@PathVariable Long bookId) {
+        transactionService.rejectAllOffers(bookId);
+        return ResponseEntity.ok(new ResponseMessage("All offers rejected successfully"));
+    }
+
     @GetMapping("/transactions")
     @Operation(summary = "Lấy danh sách toàn bộ các giao dịch (có phân trang)")
     public ResponseEntity<Page<TransactionDTO>> getTransactions(

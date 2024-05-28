@@ -143,6 +143,38 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public void acceptEarliestOffer(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+
+        var offers = exchangeOfferRepository.findByTargetBookIdAndStatusOrderByTimestampAsc(bookId, ExchangeOfferStatus.PENDING);
+        if (!offers.isEmpty()) {
+            acceptOffer(bookId, offers.get(0).getId());
+        }
+    }
+
+    @Override
+    public void rejectAllOffers(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", "id", bookId));
+
+        var offers = exchangeOfferRepository.findByTargetBookIdAndStatusOrderByTimestampAsc(bookId, ExchangeOfferStatus.PENDING);
+
+        offers.forEach(offer -> {
+            offer.setStatus(ExchangeOfferStatus.REJECTED);
+            exchangeOfferRepository.save(offer);
+
+            // notify user
+            notificationService.sendNotification(Notification.builder()
+                    .user(offer.getBorrower())
+                    .content("Your offer on book '" + offer.getTargetBook().getTitle() + "' has been rejected")
+                    .href("book/" + offer.getTargetBook().getId())
+                    .type(NotificationType.ERROR)
+                    .build());
+        });
+    }
+
+    @Override
     public Page<TransactionDTO> getTransactions(int page, int size) {
         return transactionRepository
                 .findAllByOrderByTimestampDesc(PageRequest.of(page, size))
