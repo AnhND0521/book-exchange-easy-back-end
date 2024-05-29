@@ -136,7 +136,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.listByCategories(categories, booksPerCategories));
     }
 
-    @PostMapping("/{bookId}/upload-image-book")
+    @PostMapping("/books/{id}/upload-image-book")
     @Operation(summary = "Upload ảnh của sách")
     private ResponseEntity<ResponseMessage> uploadBookImage(@PathVariable Long id, @RequestParam MultipartFile imageFile) throws IOException {
         return ResponseEntity.ok(new ResponseMessage(bookService.uploadBookImage(id, imageFile)));

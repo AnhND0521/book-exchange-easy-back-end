@@ -35,12 +35,15 @@ public class EventServiceImpl implements EventService {
         StoreEvent oldEvent = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
        StoreEvent event = toEntity(eventDTO);
-        event.setConcernedUsers(oldEvent.getConcernedUsers());
+       if(eventDTO.getConcernedUserIds()!=null){
+              event.setConcernedUsers(eventDTO.getConcernedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toSet()));
+       }else{
+           event.setConcernedUsers(oldEvent.getConcernedUsers());
+       }
         event.setCreated(oldEvent.getCreated());
         event.setOwner(oldEvent.getOwner());
         event.setId(id);
         event = eventRepository.save(event);
-
         return toDTO(event);
     }
 
