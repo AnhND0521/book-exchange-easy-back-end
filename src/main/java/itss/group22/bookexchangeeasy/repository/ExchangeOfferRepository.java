@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface ExchangeOfferRepository extends JpaRepository<ExchangeOffer, Long> {
     List<ExchangeOffer> findByTargetBookIdOrderByTimestampAsc(Long id);
+    List<ExchangeOffer> findByTargetBookIdAndStatusOrderByTimestampAsc(Long id, ExchangeOfferStatus status);
     List<ExchangeOffer> findByStatus(ExchangeOfferStatus status);
 }

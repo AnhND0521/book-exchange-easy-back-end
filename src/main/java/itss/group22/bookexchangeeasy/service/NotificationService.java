@@ -6,5 +6,6 @@ import org.springframework.data.domain.Page;
 
 public interface NotificationService {
     Page<NotificationDTO> getNotifications(Long userId, int page, int size);
+    void markNotificationAsRead(Long userId, Long notificationId);
     void sendNotification(Notification notification);
 }

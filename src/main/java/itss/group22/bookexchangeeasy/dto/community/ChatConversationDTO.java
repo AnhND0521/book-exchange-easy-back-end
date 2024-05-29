@@ -13,9 +13,13 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatConversationDTO {
     private Long id;
-    private Long user1_id;
-    private String user1_name;
-    private Long user2_id;
-    private String user2_name;
+    private Long userId1;
+    private Long userId2;
+    private String userName1;
+    private String userName2;
+    private String lastMessageContent;
     private LocalDateTime lastMessageTime;
+    private Boolean lastSentByUser1;
+    private Boolean seenByUser1;
+    private Boolean seenByUser2;
 }

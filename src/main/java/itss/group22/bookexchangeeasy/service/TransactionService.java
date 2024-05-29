@@ -11,6 +11,8 @@ public interface TransactionService {
     List<ExchangeOfferDTO> getOffersOfBook(Long bookId);
     void acceptOffer(Long bookId, Long offerId);
     void rejectOffer(Long bookId, Long offerId);
+    void acceptEarliestOffer(Long bookId);
+    void rejectAllOffers(Long bookId);
     Page<TransactionDTO> getTransactions(int page, int size);
     Page<TransactionDTO> getTransactionsByUser(Long userId, int page, int size);
     TransactionDTO getTransactionDetails(String id);

@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.entity;
 
+import itss.group22.bookexchangeeasy.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,9 @@ public class Notification {
     private LocalDateTime timestamp;
 
     private String href;
+
+    private Boolean isRead;
+
+    @Enumerated
+    private NotificationType type;
 }

@@ -29,4 +29,8 @@ public class ChatConversation {
     private User user2;
 
     private LocalDateTime lastMessageTime;
+
+    private Boolean seenByUser1;
+
+    private Boolean seenByUser2;
 }

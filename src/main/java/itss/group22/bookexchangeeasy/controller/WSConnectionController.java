@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Controller
@@ -18,6 +19,19 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public class WSConnectionController {
     private final OnlineUserSet onlineUserSet;
     private final JwtDecoder jwtDecoder;
+
+    @EventListener
+    public void connect(SessionConnectEvent event) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String token = headerAccessor.getFirstNativeHeader("token");
+        connect(token, headerAccessor);
+    }
+
+    @EventListener
+    public void disconnect(SessionDisconnectEvent event) {
+        onlineUserSet.removeUserBySessionId(event.getSessionId());
+        log.info("Client disconnected: " + event.getSessionId());
+    }
 
     @MessageMapping("/connect")
     public void connect(String token, StompHeaderAccessor headerAccessor) {
@@ -33,11 +47,5 @@ public class WSConnectionController {
         Jwt jwt = jwtDecoder.decode(token);
         Long userId = jwt.getClaim("id");
         onlineUserSet.remove(userId);
-    }
-
-    @EventListener
-    public void disconnect(SessionDisconnectEvent event) {
-        onlineUserSet.removeUserBySessionId(event.getSessionId());
-        log.info("Client disconnected: " + event.getSessionId());
     }
 }
