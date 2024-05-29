@@ -74,6 +74,7 @@ public class BookServiceImpl implements BookService {
         exchangeOfferRepository.deleteAll(requests);
 
         book.setCategories(null);
+        book.setConcernedUsers(null);
         book = bookRepository.save(book);
         bookRepository.delete(book);
     }

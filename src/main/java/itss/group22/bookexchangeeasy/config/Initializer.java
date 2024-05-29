@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -232,7 +233,7 @@ public class Initializer {
 
                     BookStatus status = BookStatus.AVAILABLE;
                     User owner = allUsers.get(random.nextInt(allUsers.size()));
-                    List<User> concernUser = null;
+                    List<User> concernUser = new ArrayList<>();
                     while (concernUser.size() < 10) {
                         int randomIndex = random.nextInt(allUsers.size());
                         User randomUser = allUsers.get(randomIndex);

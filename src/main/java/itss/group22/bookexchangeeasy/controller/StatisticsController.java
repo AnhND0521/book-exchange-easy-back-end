@@ -47,7 +47,7 @@ public class StatisticsController {
     @Operation(summary = "Thống kê số giao dịch theo từng ngày")
     public ResponseEntity<List<LineChartItem>> getTransactionCountByDate(
             @RequestParam(name = "from", required = false) LocalDate from,
-            @RequestParam(name = "from", required = false) LocalDate to
+            @RequestParam(name = "to", required = false) LocalDate to
     ) {
         return ResponseEntity.ok(statisticsService.getTransactionCountByDate(from, to));
     }
