@@ -1,11 +1,11 @@
 package itss.group22.bookexchangeeasy.service.impl;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
-import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.StoreEvent;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.PostRepository;
 import itss.group22.bookexchangeeasy.repository.StoreEventRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
+import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import itss.group22.bookexchangeeasy.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -13,7 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final StoreEventRepository eventRepository;
     private final PostRepository postRepository;
+    private final CloudinaryService cloudinaryService;
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
         StoreEvent event = toEntity(eventDTO);
@@ -77,6 +81,16 @@ public class EventServiceImpl implements EventService {
         StoreEvent event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id",eventId));
         return toDTO(event);
+    }
+
+    @Override
+    public String uploadEventImage(Long id, MultipartFile imageFile) throws IOException {
+        StoreEvent event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+        Map data =  cloudinaryService.uploadFile(imageFile);
+        event.setImagePath(data.get("url").toString());
+        eventRepository.save(event);
+        return data.get("url").toString();
     }
 
 

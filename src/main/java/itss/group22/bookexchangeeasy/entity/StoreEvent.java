@@ -44,4 +44,5 @@ public class StoreEvent {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> concernedUsers;
+    private String imagePath;
 }

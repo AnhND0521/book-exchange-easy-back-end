@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -71,6 +74,12 @@ public class EventController {
     @Operation(summary = "Lấy thông tin một sự kiện cụ thể")
     public ResponseEntity<EventDTO> getEventDetails(@PathVariable Long eventId) {
         return ResponseEntity.ok(eventService.getEventDetails(eventId));
+    }
+
+    @PostMapping("/events/{id}/upload-image-event")
+    @Operation(summary = "Upload ảnh của event")
+    private ResponseEntity<ResponseMessage> uploadEventImage(@PathVariable Long id, @RequestParam MultipartFile imageFile) throws IOException {
+        return ResponseEntity.ok(new ResponseMessage(eventService.uploadEventImage(id, imageFile)));
     }
 
 

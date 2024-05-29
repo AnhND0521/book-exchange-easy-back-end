@@ -1,6 +1,9 @@
 package itss.group22.bookexchangeeasy.service;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface EventService {
     EventDTO createEvent(EventDTO eventDTO);
@@ -10,6 +13,7 @@ public interface EventService {
     Page<EventDTO> getEventsByOwner(Long userId, int page, int size);
     Page<EventDTO> getEventsByConcernedUser(Long userId, int page, int size);
     EventDTO getEventDetails(Long eventId);
+    String uploadEventImage(Long id, MultipartFile imageFile) throws IOException;
 
 
 }
