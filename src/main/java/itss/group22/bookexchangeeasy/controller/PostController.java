@@ -71,8 +71,8 @@ public class PostController {
     }
     @PostMapping("/posts/{id}/upload-image-post")
     @Operation(summary = "Upload ảnh của post")
-    private ResponseEntity<ResponseMessage> uploadPostImage(@PathVariable Long postId, @RequestParam MultipartFile imageFile) throws IOException {
-        return ResponseEntity.ok(new ResponseMessage(postService.uploadPostImage(postId, imageFile)));
+    private ResponseEntity<ResponseMessage> uploadPostImage(@PathVariable Long id, @RequestParam MultipartFile imageFile) throws IOException {
+        return ResponseEntity.ok(new ResponseMessage(postService.uploadPostImage(id, imageFile)));
     }
 
 }

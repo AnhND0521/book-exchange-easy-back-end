@@ -1,6 +1,5 @@
 package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.EventService;
