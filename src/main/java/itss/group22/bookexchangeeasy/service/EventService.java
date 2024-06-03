@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public interface EventService {
     EventDTO createEvent(EventDTO eventDTO);
@@ -14,6 +15,7 @@ public interface EventService {
     Page<EventDTO> getEventsByConcernedUser(Long userId, int page, int size);
     EventDTO getEventDetails(Long eventId);
     String uploadEventImage(Long id, MultipartFile imageFile) throws IOException;
+    Page<EventDTO> getEventByDate(LocalDate from, LocalDate to, int page, int size);
 
 
 }

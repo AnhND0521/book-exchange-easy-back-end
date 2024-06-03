@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+
 @Repository
 public interface StoreEventRepository extends JpaRepository<StoreEvent, Long> {
     @Query("SELECT COUNT(u) FROM StoreEvent u WHERE YEAR(u.created) = ?1 AND MONTH(u.created) = ?2")
@@ -25,5 +27,9 @@ public interface StoreEventRepository extends JpaRepository<StoreEvent, Long> {
             "WHERE u.id = ?1 " +           // Filter by user ID
             "ORDER BY p.startTime DESC")
     Page<StoreEvent> findByConcernedUsersOrderByStartTimeDesc(Long userId, Pageable pageable);
+    @Query("SELECT p FROM StoreEvent p " +
+            "WHERE p.created >= ?1 AND p.created <= ?2 " +
+            "ORDER BY p.created DESC")
+    Page<StoreEvent> findByDateRangeOrderByStartTimeDesc( LocalDate from, LocalDate to,Pageable pageable);
 }
 

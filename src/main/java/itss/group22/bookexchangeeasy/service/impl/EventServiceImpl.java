@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Collectors;
 @Service
@@ -93,6 +94,11 @@ public class EventServiceImpl implements EventService {
         return data.get("url").toString();
     }
 
+    @Override
+    public Page<EventDTO> getEventByDate(LocalDate from, LocalDate to, int page, int size) {
+        return eventRepository.findByDateRangeOrderByStartTimeDesc( from, to,PageRequest.of(page, size)).map(this::toDTO);
+    }
+
 
     private EventDTO toDTO(StoreEvent event) {
         EventDTO eventDTO = mapper.map(event, EventDTO.class);
@@ -112,4 +118,5 @@ public class EventServiceImpl implements EventService {
 
         return event;
     }
+
 }

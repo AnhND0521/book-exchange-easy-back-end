@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
+import itss.group22.bookexchangeeasy.dto.statistics.LineChartItem;
 import itss.group22.bookexchangeeasy.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -80,6 +83,17 @@ public class EventController {
     private ResponseEntity<ResponseMessage> uploadEventImage(@PathVariable Long id, @RequestParam MultipartFile imageFile) throws IOException {
         return ResponseEntity.ok(new ResponseMessage(eventService.uploadEventImage(id, imageFile)));
     }
+    @GetMapping("/events/event-by-date")
+    @Operation(summary = "Lọc sự kiện theo ngày")
+    public ResponseEntity<Page<EventDTO>> getEventByDate(
+            @RequestParam(name = "from", required = false) LocalDate from,
+            @RequestParam(name = "to", required = false) LocalDate to,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(eventService.getEventByDate(from, to,page,size));
+    }
+
 
 
 }
