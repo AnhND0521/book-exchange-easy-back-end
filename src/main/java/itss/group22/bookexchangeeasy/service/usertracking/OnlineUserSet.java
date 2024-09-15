@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.service.datastructure;
+package itss.group22.bookexchangeeasy.service.usertracking;
 
 import org.springframework.stereotype.Component;
 

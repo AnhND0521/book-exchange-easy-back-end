@@ -11,7 +11,7 @@ import itss.group22.bookexchangeeasy.repository.ChatConversationRepository;
 import itss.group22.bookexchangeeasy.repository.ChatMessageRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.ChatService;
-import itss.group22.bookexchangeeasy.service.datastructure.OnlineUserSet;
+import itss.group22.bookexchangeeasy.service.usertracking.OnlineUserSet;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;

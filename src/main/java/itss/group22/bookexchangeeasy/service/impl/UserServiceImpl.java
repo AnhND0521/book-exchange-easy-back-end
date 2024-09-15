@@ -4,19 +4,17 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import itss.group22.bookexchangeeasy.dto.user.*;
-import itss.group22.bookexchangeeasy.entity.AddressUnit;
-import itss.group22.bookexchangeeasy.entity.ContactInfo;
-import itss.group22.bookexchangeeasy.entity.Role;
-import itss.group22.bookexchangeeasy.entity.User;
+import itss.group22.bookexchangeeasy.entity.*;
 import itss.group22.bookexchangeeasy.enums.Gender;
+import itss.group22.bookexchangeeasy.enums.KeyType;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
-import itss.group22.bookexchangeeasy.repository.AddressUnitRepository;
-import itss.group22.bookexchangeeasy.repository.ContactInfoRepository;
-import itss.group22.bookexchangeeasy.repository.RoleRepository;
-import itss.group22.bookexchangeeasy.repository.UserRepository;
+import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.CloudinaryService;
+import itss.group22.bookexchangeeasy.service.MailService;
 import itss.group22.bookexchangeeasy.service.UserService;
+import itss.group22.bookexchangeeasy.service.mail.Mail;
+import itss.group22.bookexchangeeasy.service.mail.ResetPasswordMail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -30,10 +28,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,12 +45,20 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final AddressUnitRepository addressUnitRepository;
     private final ContactInfoRepository contactInfoRepository;
+    private final KeyRepository keyRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
     private final CloudinaryService cloudinaryService;
+    private final MailService mailService;
 
     @Value("${app.secret-key}")
     private String secretKey;
+
+    @Value("${app.generated-key.length}")
+    private int keyLength;
+
+    @Value("${app.web.reset-password-url}")
+    private String resetPasswordUrl;
 
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) {
@@ -287,5 +295,39 @@ public class UserServiceImpl implements UserService {
         }
 
         return userProfile;
+    }
+
+    @Override
+    public void requestForgotPassword(ResetPasswordRequest request) {
+        String userIdentifier = request.getUserIdentifier();
+        User user = userRepository.findByEmailOrContactInfoPhoneNumber(userIdentifier, userIdentifier)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email or phone number", userIdentifier));
+
+        Key key = Key.builder()
+                .userId(user.getId())
+                .value(generateKey())
+                .createdTime(LocalDateTime.now())
+                .keyType(KeyType.RESET_PASSWORD)
+                .isUsed(Boolean.FALSE)
+                .build();
+
+        keyRepository.save(key);
+
+        Mail mail = new ResetPasswordMail(
+                user.getName(),
+                key.getCreatedTime(),
+                resetPasswordUrl.replace("{key}", key.getValue())
+        );
+        mailService.sendMail(user.getEmail(), mail);
+    }
+
+    private String generateKey() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder key = new StringBuilder();
+        Random random = new Random();
+        for (int i=0;i<keyLength;i++) {
+            key.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return key.toString();
     }
 }

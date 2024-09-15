@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.controller;
 
-import itss.group22.bookexchangeeasy.service.datastructure.OnlineUserSet;
-import itss.group22.bookexchangeeasy.service.datastructure.UserContext;
+import itss.group22.bookexchangeeasy.service.usertracking.OnlineUserSet;
+import itss.group22.bookexchangeeasy.service.usertracking.UserContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

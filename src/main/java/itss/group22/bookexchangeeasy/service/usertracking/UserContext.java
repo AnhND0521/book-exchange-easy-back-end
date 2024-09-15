@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.service.datastructure;
+package itss.group22.bookexchangeeasy.service.usertracking;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

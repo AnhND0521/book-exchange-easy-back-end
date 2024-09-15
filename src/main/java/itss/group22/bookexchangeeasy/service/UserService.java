@@ -17,4 +17,5 @@ public interface UserService {
     void lockUserAccount(Long id);
     void unlockUserAccount(Long id);
     String uploadAvatar(Long id, MultipartFile image) throws IOException;
+    void requestForgotPassword(ResetPasswordRequest request);
 }

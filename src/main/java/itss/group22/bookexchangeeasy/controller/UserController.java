@@ -1,10 +1,13 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.dto.user.*;
 import itss.group22.bookexchangeeasy.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -105,5 +108,14 @@ public class UserController {
     private ResponseEntity<ResponseMessage> unlockUserAccount(@PathVariable Long id) {
         userService.unlockUserAccount(id);
         return ResponseEntity.ok(new ResponseMessage("User account unlocked successfully"));
+    }
+
+    @PostMapping("/forgot-password/request")
+    @Operation(summary = "Quên mật khẩu - bước 1: điền thông tin email / số điện thoại")
+    private ResponseEntity<ResponseMessage> requestForgotPassword(
+            @RequestBody @Valid ResetPasswordRequest request
+    ) {
+        userService.requestForgotPassword(request);
+        return ResponseEntity.ok(new ResponseMessage("Reset password mail sent to user successfully"));
     }
 }
