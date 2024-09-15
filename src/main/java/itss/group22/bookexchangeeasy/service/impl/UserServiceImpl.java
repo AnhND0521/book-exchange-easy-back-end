@@ -30,10 +30,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +53,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${app.generated-key.length}")
     private int keyLength;
+
+    @Value("${app.generated-key.expire-seconds}")
+    private int keyExpireSeconds;
 
     @Value("${app.web.reset-password-url}")
     private String resetPasswordUrl;
@@ -306,10 +306,11 @@ public class UserServiceImpl implements UserService {
         Key key = Key.builder()
                 .userId(user.getId())
                 .value(generateKey())
-                .createdTime(LocalDateTime.now())
                 .keyType(KeyType.RESET_PASSWORD)
                 .isUsed(Boolean.FALSE)
                 .build();
+        key.setCreatedTime(LocalDateTime.now());
+        key.setExpireTime(key.getCreatedTime().plusSeconds(keyExpireSeconds));
 
         keyRepository.save(key);
 
@@ -329,5 +330,16 @@ public class UserServiceImpl implements UserService {
             key.append(characters.charAt(random.nextInt(characters.length())));
         }
         return key.toString();
+    }
+
+    @Override
+    public ValidateKeyResponse validateKey(Long userId, String key) {
+        Optional<Key> keyEntity = keyRepository.findByUserIdAndValueAndIsUsedAndExpireTimeAfter(
+                userId,
+                key,
+                false,
+                LocalDateTime.now()
+        );
+        return ValidateKeyResponse.builder().isValid(keyEntity.isPresent()).build();
     }
 }

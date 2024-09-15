@@ -118,4 +118,13 @@ public class UserController {
         userService.requestForgotPassword(request);
         return ResponseEntity.ok(new ResponseMessage("Reset password mail sent to user successfully"));
     }
+
+    @GetMapping("/{id}/validate-key")
+    @Operation(summary = "Kiểm tra xem một key có hợp lệ không")
+    private ResponseEntity<ValidateKeyResponse> validateKey(
+            @PathVariable(name = "id") Long userId,
+            @RequestParam(name = "key") String key
+    ) {
+        return ResponseEntity.ok(userService.validateKey(userId, key));
+    }
 }
