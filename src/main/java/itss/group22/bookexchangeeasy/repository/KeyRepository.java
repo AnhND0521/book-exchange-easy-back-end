@@ -10,6 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface KeyRepository extends JpaRepository<Key, Long> {
+    Optional<Key> findByValueAndIsUsed(String value, Boolean isUsed);
     Optional<Key> findByValueAndIsUsedAndExpireTimeAfter(String value, Boolean isUsed, LocalDateTime time);
+    Optional<Key> findByValueAndKeyTypeAndIsUsed(String value, KeyType keyType, Boolean isUsed);
     Optional<Key> findByValueAndKeyTypeAndIsUsedAndExpireTimeAfter(String value, KeyType keyType, Boolean isUsed, LocalDateTime time);
 }

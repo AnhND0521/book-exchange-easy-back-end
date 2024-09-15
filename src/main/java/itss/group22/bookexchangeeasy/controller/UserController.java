@@ -43,6 +43,13 @@ public class UserController {
         return ResponseEntity.ok(new ResponseMessage("User account created successfully"));
     }
 
+    @PostMapping("/activate")
+    @Operation(summary = "Kích hoạt tài khoản người dùng")
+    private ResponseEntity<ResponseMessage> activate(@RequestBody @Valid ActivateRequest request) {
+        userService.activate(request);
+        return ResponseEntity.ok(new ResponseMessage("User account activated successfully"));
+    }
+
     @PostMapping("/{id}/upload-avatar")
     @Operation(summary = "Upload ảnh đại diện của người dùng")
     private ResponseEntity<ResponseMessage> uploadAvatar(@PathVariable Long id, @RequestParam  MultipartFile imageFile) throws IOException {

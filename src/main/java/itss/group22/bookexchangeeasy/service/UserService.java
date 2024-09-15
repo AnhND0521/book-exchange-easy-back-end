@@ -9,6 +9,7 @@ import java.util.List;
 public interface UserService {
     AuthResponse authenticate(AuthRequest authRequest);
     void register(RegisterRequest registerRequest);
+    void activate(ActivateRequest activateRequest);
     UserProfile getProfile(Long id);
     void updateProfile(Long id, UserProfile userProfile);
     void changePassword(Long id, ChangePasswordDTO changePasswordDTO);

@@ -13,6 +13,7 @@ import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import itss.group22.bookexchangeeasy.service.MailService;
 import itss.group22.bookexchangeeasy.service.UserService;
+import itss.group22.bookexchangeeasy.service.mail.ActivateAccountMail;
 import itss.group22.bookexchangeeasy.service.mail.Mail;
 import itss.group22.bookexchangeeasy.service.mail.ResetPasswordMail;
 import lombok.RequiredArgsConstructor;
@@ -57,8 +58,11 @@ public class UserServiceImpl implements UserService {
     @Value("${app.generated-key.expire-seconds}")
     private int keyExpireSeconds;
 
-    @Value("${app.web.reset-password-url}")
+    @Value("${app.web.url.reset-password}")
     private String resetPasswordUrl;
+
+    @Value("${app.web.url.activate-account}")
+    private String activateAccountUrl;
 
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) {
@@ -68,6 +72,9 @@ public class UserServiceImpl implements UserService {
 
         if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
             throw new ApiException("Incorrect password", HttpStatus.FORBIDDEN);
+
+        if (!user.getIsVerified())
+            throw ApiException.ACCOUNT_NOT_ACTIVATED;
 
         if (user.getIsLocked())
             throw new ApiException("User account is currently locked", HttpStatus.FORBIDDEN);
@@ -123,7 +130,22 @@ public class UserServiceImpl implements UserService {
         contactInfo = contactInfoRepository.save(contactInfo);
 
         user.setContactInfo(contactInfo);
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        Key key = Key.builder()
+                .userId(user.getId())
+                .value(generateKey())
+                .keyType(KeyType.ACTIVATE)
+                .isUsed(Boolean.FALSE)
+                .build();
+        key.setCreatedTime(LocalDateTime.now());
+        keyRepository.save(key);
+        
+        Mail mail = new ActivateAccountMail(
+                user.getName(),
+                activateAccountUrl.replace("{key}", key.getValue())
+        );
+        mailService.sendMail(user.getEmail(), mail);
     }
 
     private String generateToken(User user) {
@@ -150,6 +172,25 @@ public class UserServiceImpl implements UserService {
         if (user.getRoles() == null || user.getRoles().isEmpty()) return "";
         var roles = user.getRoles().stream().map(Role::getName).toList();
         return String.join(" ", roles);
+    }
+
+    @Override
+    public void activate(ActivateRequest activateRequest) {
+        Key key = keyRepository.findByValueAndKeyTypeAndIsUsed(activateRequest.getKey(), KeyType.ACTIVATE, false)
+                .orElseThrow(() -> ApiException.KEY_NOT_VALID);
+
+        User user = userRepository.findById(key.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", key.getUserId()));
+
+        if (user.getIsVerified()) {
+            throw ApiException.ACCOUNT_ALREADY_ACTIVATED;
+        }
+
+        user.setIsVerified(true);
+        userRepository.save(user);
+
+        key.setIsUsed(true);
+        keyRepository.save(key);
     }
 
     @Override
@@ -261,7 +302,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
-        Map data =  cloudinaryService.uploadFile(imageFile);
+        Map data = cloudinaryService.uploadFile(imageFile);
         String pictureUrl = data.get("url").toString();
         user.setPictureUrl(pictureUrl);
         userRepository.save(user);
@@ -322,16 +363,6 @@ public class UserServiceImpl implements UserService {
         mailService.sendMail(user.getEmail(), mail);
     }
 
-    private String generateKey() {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder key = new StringBuilder();
-        Random random = new Random();
-        for (int i=0;i<keyLength;i++) {
-            key.append(characters.charAt(random.nextInt(characters.length())));
-        }
-        return key.toString();
-    }
-
     @Override
     public void resetPassword(ResetPasswordRequest request) {
         Key key = keyRepository.findByValueAndKeyTypeAndIsUsedAndExpireTimeAfter(
@@ -339,7 +370,7 @@ public class UserServiceImpl implements UserService {
                 KeyType.RESET_PASSWORD,
                 false,
                 LocalDateTime.now()
-        ).orElseThrow(() -> ApiException.KEY_NOT_VALID_EXCEPTION);
+        ).orElseThrow(() -> ApiException.KEY_NOT_VALID);
 
         User user = userRepository.findById(key.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", key.getUserId()));
@@ -353,13 +384,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ValidateKeyResponse validateKey(String key) {
-        Optional<Key> keyEntity = keyRepository.findByValueAndIsUsedAndExpireTimeAfter(
-                key,
-                false,
-                LocalDateTime.now()
-        );
+        Key keyEntity = keyRepository.findByValueAndIsUsed(key, false).orElse(null);
+
+        boolean isValid = keyEntity != null && (keyEntity.getExpireTime() == null || keyEntity.getExpireTime().isAfter(LocalDateTime.now()));
+
         return ValidateKeyResponse.builder()
-                .isValid(keyEntity.isPresent())
+                .isValid(isValid)
                 .build();
+    }
+
+    private String generateKey() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder key = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < keyLength; i++) {
+            key.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return key.toString();
     }
 }
