@@ -298,7 +298,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void requestForgotPassword(ResetPasswordRequest request) {
+    public void requestForgotPassword(ForgotPasswordRequest request) {
         String userIdentifier = request.getUserIdentifier();
         User user = userRepository.findByEmailOrContactInfoPhoneNumber(userIdentifier, userIdentifier)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email or phone number", userIdentifier));
@@ -333,13 +333,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ValidateKeyResponse validateKey(Long userId, String key) {
-        Optional<Key> keyEntity = keyRepository.findByUserIdAndValueAndIsUsedAndExpireTimeAfter(
-                userId,
+    public void resetPassword(ResetPasswordRequest request) {
+        Key key = keyRepository.findByValueAndKeyTypeAndIsUsedAndExpireTimeAfter(
+                request.getKey(),
+                KeyType.RESET_PASSWORD,
+                false,
+                LocalDateTime.now()
+        ).orElseThrow(() -> ApiException.KEY_NOT_VALID_EXCEPTION);
+
+        User user = userRepository.findById(key.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", key.getUserId()));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        key.setIsUsed(true);
+        keyRepository.save(key);
+    }
+
+    @Override
+    public ValidateKeyResponse validateKey(String key) {
+        Optional<Key> keyEntity = keyRepository.findByValueAndIsUsedAndExpireTimeAfter(
                 key,
                 false,
                 LocalDateTime.now()
         );
-        return ValidateKeyResponse.builder().isValid(keyEntity.isPresent()).build();
+        return ValidateKeyResponse.builder()
+                .isValid(keyEntity.isPresent())
+                .build();
     }
 }

@@ -1,13 +1,10 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.dto.user.*;
 import itss.group22.bookexchangeeasy.service.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -113,18 +110,26 @@ public class UserController {
     @PostMapping("/forgot-password/request")
     @Operation(summary = "Quên mật khẩu - bước 1: điền thông tin email / số điện thoại")
     private ResponseEntity<ResponseMessage> requestForgotPassword(
-            @RequestBody @Valid ResetPasswordRequest request
+            @RequestBody @Valid ForgotPasswordRequest request
     ) {
         userService.requestForgotPassword(request);
         return ResponseEntity.ok(new ResponseMessage("Reset password mail sent to user successfully"));
     }
 
-    @GetMapping("/{id}/validate-key")
+    @PostMapping("/forgot-password/reset")
+    @Operation(summary = "Quên mật khẩu - bước 2: đặt mật khẩu mới")
+    private ResponseEntity<ResponseMessage> resetPassword(
+            @RequestBody @Valid ResetPasswordRequest request
+    ) {
+        userService.resetPassword(request);
+        return ResponseEntity.ok(new ResponseMessage("Reset user password successfully"));
+    }
+
+    @GetMapping("/validate-key")
     @Operation(summary = "Kiểm tra xem một key có hợp lệ không")
     private ResponseEntity<ValidateKeyResponse> validateKey(
-            @PathVariable(name = "id") Long userId,
             @RequestParam(name = "key") String key
     ) {
-        return ResponseEntity.ok(userService.validateKey(userId, key));
+        return ResponseEntity.ok(userService.validateKey(key));
     }
 }

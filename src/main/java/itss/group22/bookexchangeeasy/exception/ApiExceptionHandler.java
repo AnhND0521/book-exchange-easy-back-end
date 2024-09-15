@@ -18,7 +18,7 @@ import java.nio.file.AccessDeniedException;
 public class ApiExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorMessage> apiException(ApiException exception, WebRequest webRequest) {
-        return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), exception.getStatus());
+        return new ResponseEntity<>(new ErrorMessage(exception.getErrorCode(), exception.getMessage()), exception.getStatus());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
