@@ -29,6 +29,7 @@ public abstract class CommentMapper {
                 .content(comment.getContent())
                 .likes(commentsUsersLikeRefRepository.countByCommentId(comment.getId()))
                 .replies(commentsReplyRefRepository.countByBaseCommentId(comment.getId()))
+                .createdAt(comment.getCreatedAt())
                 .build();
     }
 }

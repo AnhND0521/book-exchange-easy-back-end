@@ -2,8 +2,10 @@ package itss.group22.bookexchangeeasy.service.impl;
 
 import itss.group22.bookexchangeeasy.dto.community.comment.CreateCommentRequest;
 import itss.group22.bookexchangeeasy.dto.community.comment.GetCommentResponse;
+import itss.group22.bookexchangeeasy.dto.community.comment.UpdateCommentRequest;
 import itss.group22.bookexchangeeasy.entity.Comment;
 import itss.group22.bookexchangeeasy.entity.CommentsPostsRef;
+import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.CommentRepository;
 import itss.group22.bookexchangeeasy.repository.CommentsPostsRefRepository;
 import itss.group22.bookexchangeeasy.service.CommentService;
@@ -41,5 +43,13 @@ public class CommentServiceImpl implements CommentService {
     public Page<GetCommentResponse> getCommentsOnPost(Long postId, int page, int size) {
         Page<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size));
         return comments.map(commentMapper::mapCommentToGetCommentResponse);
+    }
+
+    @Override
+    public void updateComment(Long commentId, UpdateCommentRequest request) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
+        comment.setContent(request.getContent());
+        commentRepository.save(comment);
     }
 }

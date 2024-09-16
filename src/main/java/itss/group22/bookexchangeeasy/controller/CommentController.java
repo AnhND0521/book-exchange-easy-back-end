@@ -3,6 +3,7 @@ package itss.group22.bookexchangeeasy.controller;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.dto.community.comment.CreateCommentRequest;
 import itss.group22.bookexchangeeasy.dto.community.comment.GetCommentResponse;
+import itss.group22.bookexchangeeasy.dto.community.comment.UpdateCommentRequest;
 import itss.group22.bookexchangeeasy.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +33,14 @@ public class CommentController {
             @RequestParam(name = "size", required = false, defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(commentService.getCommentsOnPost(postId, page, size));
+    }
+
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<ResponseMessage> updateComment(
+            @PathVariable("commentId") Long commentId,
+            @RequestBody @Valid UpdateCommentRequest request
+    ) {
+        commentService.updateComment(commentId, request);
+        return ResponseEntity.ok(new ResponseMessage("Comment updated successfully"));
     }
 }
