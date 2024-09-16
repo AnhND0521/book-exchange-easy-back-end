@@ -9,4 +9,5 @@ public interface CommentService {
     void commentOnPost(Long postId, CreateCommentRequest request);
     Page<GetCommentResponse> getCommentsOnPost(Long postId, int page, int size);
     void updateComment(Long commentId, UpdateCommentRequest request);
+    void deleteComment(Long commentId);
 }

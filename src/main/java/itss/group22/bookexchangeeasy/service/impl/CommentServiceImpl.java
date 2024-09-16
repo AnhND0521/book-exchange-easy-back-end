@@ -8,6 +8,8 @@ import itss.group22.bookexchangeeasy.entity.CommentsPostsRef;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.CommentRepository;
 import itss.group22.bookexchangeeasy.repository.CommentsPostsRefRepository;
+import itss.group22.bookexchangeeasy.repository.CommentsReplyRefRepository;
+import itss.group22.bookexchangeeasy.repository.CommentsUsersLikeRefRepository;
 import itss.group22.bookexchangeeasy.service.CommentService;
 import itss.group22.bookexchangeeasy.service.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,8 @@ import org.springframework.stereotype.Service;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommentsPostsRefRepository commentsPostsRefRepository;
+    private final CommentsReplyRefRepository commentsReplyRefRepository;
+    private final CommentsUsersLikeRefRepository commentsUsersLikeRefRepository;
     private final CommentMapper commentMapper;
 
     @Override
@@ -51,5 +56,16 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
         comment.setContent(request.getContent());
         commentRepository.save(comment);
+    }
+
+    @Override
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
+        commentsPostsRefRepository.deleteAllByCommentId(commentId);
+        commentsReplyRefRepository.deleteAllByBaseCommentIdOrReplyCommentId(commentId, commentId);
+        commentsUsersLikeRefRepository.deleteAllByCommentId(commentId);
+        commentRepository.delete(comment);
     }
 }
