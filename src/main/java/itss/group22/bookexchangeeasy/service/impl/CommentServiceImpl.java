@@ -2,9 +2,12 @@ package itss.group22.bookexchangeeasy.service.impl;
 
 import itss.group22.bookexchangeeasy.dto.community.comment.CreateCommentRequest;
 import itss.group22.bookexchangeeasy.dto.community.comment.GetCommentResponse;
+import itss.group22.bookexchangeeasy.dto.community.comment.LikeUnlikeCommentRequest;
 import itss.group22.bookexchangeeasy.dto.community.comment.UpdateCommentRequest;
 import itss.group22.bookexchangeeasy.entity.Comment;
 import itss.group22.bookexchangeeasy.entity.CommentsPostsRef;
+import itss.group22.bookexchangeeasy.entity.CommentsUsersLikeRef;
+import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.CommentRepository;
 import itss.group22.bookexchangeeasy.repository.CommentsPostsRefRepository;
@@ -18,6 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +72,29 @@ public class CommentServiceImpl implements CommentService {
         commentsReplyRefRepository.deleteAllByBaseCommentIdOrReplyCommentId(commentId, commentId);
         commentsUsersLikeRefRepository.deleteAllByCommentId(commentId);
         commentRepository.delete(comment);
+    }
+
+    @Override
+    public void likeComment(Long commentId, LikeUnlikeCommentRequest request) {
+        CommentsUsersLikeRef commentsUsersLikeRef = commentsUsersLikeRefRepository.findByCommentIdAndUserId(commentId, request.getUserId());
+        if (Objects.nonNull(commentsUsersLikeRef)) {
+            throw ApiException.USER_ALREADY_LIKED_COMMENT;
+        }
+
+        commentsUsersLikeRef = CommentsUsersLikeRef.builder()
+                .commentId(commentId)
+                .userId(request.getUserId())
+                .build();
+        commentsUsersLikeRefRepository.save(commentsUsersLikeRef);
+    }
+
+    @Override
+    public void unlikeComment(Long commentId, LikeUnlikeCommentRequest request) {
+        CommentsUsersLikeRef commentsUsersLikeRef = commentsUsersLikeRefRepository.findByCommentIdAndUserId(commentId, request.getUserId());
+        if (Objects.isNull(commentsUsersLikeRef)) {
+            throw ApiException.USER_DID_NOT_LIKED_COMMENT;
+        }
+
+        commentsUsersLikeRefRepository.delete(commentsUsersLikeRef);
     }
 }

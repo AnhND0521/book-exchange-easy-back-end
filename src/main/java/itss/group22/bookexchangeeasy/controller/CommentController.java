@@ -3,6 +3,7 @@ package itss.group22.bookexchangeeasy.controller;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.dto.community.comment.CreateCommentRequest;
 import itss.group22.bookexchangeeasy.dto.community.comment.GetCommentResponse;
+import itss.group22.bookexchangeeasy.dto.community.comment.LikeUnlikeCommentRequest;
 import itss.group22.bookexchangeeasy.dto.community.comment.UpdateCommentRequest;
 import itss.group22.bookexchangeeasy.service.CommentService;
 import jakarta.validation.Valid;
@@ -50,5 +51,23 @@ public class CommentController {
     ) {
         commentService.deleteComment(commentId);
         return ResponseEntity.ok(new ResponseMessage("Comment deleted successfully"));
+    }
+
+    @PostMapping("/comments/{commentId}/like")
+    public ResponseEntity<ResponseMessage> likeComment(
+            @PathVariable("commentId") Long commentId,
+            @RequestBody @Valid LikeUnlikeCommentRequest request
+    ) {
+        commentService.likeComment(commentId, request);
+        return ResponseEntity.ok(new ResponseMessage("Comment liked successfully"));
+    }
+
+    @PostMapping("/comments/{commentId}/unlike")
+    public ResponseEntity<ResponseMessage> unlikeComment(
+            @PathVariable("commentId") Long commentId,
+            @RequestBody @Valid LikeUnlikeCommentRequest request
+    ) {
+        commentService.unlikeComment(commentId, request);
+        return ResponseEntity.ok(new ResponseMessage("Comment unliked successfully"));
     }
 }

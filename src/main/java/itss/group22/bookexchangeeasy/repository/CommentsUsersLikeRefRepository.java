@@ -10,4 +10,5 @@ public interface CommentsUsersLikeRefRepository extends JpaRepository<CommentsUs
     long countByCommentId(Long commentId);
     @Modifying
     void deleteAllByCommentId(Long commentId);
+    CommentsUsersLikeRef findByCommentIdAndUserId(Long commentId, Long userId);
 }
