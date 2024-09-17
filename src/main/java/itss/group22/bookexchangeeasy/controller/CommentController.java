@@ -70,4 +70,22 @@ public class CommentController {
         commentService.unlikeComment(commentId, request);
         return ResponseEntity.ok(new ResponseMessage("Comment unliked successfully"));
     }
+
+    @PostMapping("/comments/{commentId}/replies")
+    public ResponseEntity<ResponseMessage> createReply(
+            @PathVariable("commentId") Long commentId,
+            @RequestBody @Valid CreateCommentRequest request
+    ) {
+        commentService.createReply(commentId, request);
+        return ResponseEntity.ok(new ResponseMessage("Reply created successfully"));
+    }
+
+    @GetMapping("/comments/{commentId}/replies")
+    public ResponseEntity<Page<GetCommentResponse>> getReplies(
+            @PathVariable("commentId") Long commentId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(commentService.getReplies(commentId, page, size));
+    }
 }

@@ -13,4 +13,6 @@ public interface CommentService {
     void deleteComment(Long commentId);
     void likeComment(Long commentId, LikeUnlikeCommentRequest request);
     void unlikeComment(Long commentId, LikeUnlikeCommentRequest request);
+    void createReply(Long commentId, CreateCommentRequest request);
+    Page<GetCommentResponse> getReplies(Long commentId, int page, int size);
 }

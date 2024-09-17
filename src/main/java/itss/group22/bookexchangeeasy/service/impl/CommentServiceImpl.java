@@ -6,6 +6,7 @@ import itss.group22.bookexchangeeasy.dto.community.comment.LikeUnlikeCommentRequ
 import itss.group22.bookexchangeeasy.dto.community.comment.UpdateCommentRequest;
 import itss.group22.bookexchangeeasy.entity.Comment;
 import itss.group22.bookexchangeeasy.entity.CommentsPostsRef;
+import itss.group22.bookexchangeeasy.entity.CommentsReplyRef;
 import itss.group22.bookexchangeeasy.entity.CommentsUsersLikeRef;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
@@ -51,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<GetCommentResponse> getCommentsOnPost(Long postId, int page, int size) {
-        Page<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size));
+        Page<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId, PageRequest.of(page, size));
         return comments.map(commentMapper::mapCommentToGetCommentResponse);
     }
 
@@ -96,5 +97,27 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentsUsersLikeRefRepository.delete(commentsUsersLikeRef);
+    }
+
+    @Override
+    public void createReply(Long commentId, CreateCommentRequest request) {
+        Comment replyComment = Comment.builder()
+                .userId(request.getUserId())
+                .content(request.getContent())
+                .build();
+        replyComment = commentRepository.save(replyComment);
+
+        CommentsReplyRef commentsReplyRef = CommentsReplyRef.builder()
+                .baseCommentId(commentId)
+                .replyCommentId(replyComment.getId())
+                .build();
+        commentsReplyRefRepository.save(commentsReplyRef);
+    }
+
+    @Override
+    public Page<GetCommentResponse> getReplies(Long commentId, int page, int size) {
+        return commentRepository
+                .findRepliesByBaseCommentIdOrderByCreatedAtAsc(commentId, PageRequest.of(page, size))
+                .map(commentMapper::mapCommentToGetCommentResponse);
     }
 }
