@@ -93,7 +93,7 @@ public class CommentServiceImpl implements CommentService {
     public void unlikeComment(Long commentId, LikeUnlikeCommentRequest request) {
         CommentsUsersLikeRef commentsUsersLikeRef = commentsUsersLikeRefRepository.findByCommentIdAndUserId(commentId, request.getUserId());
         if (Objects.isNull(commentsUsersLikeRef)) {
-            throw ApiException.USER_DID_NOT_LIKED_COMMENT;
+            throw ApiException.USER_DID_NOT_LIKE_COMMENT;
         }
 
         commentsUsersLikeRefRepository.delete(commentsUsersLikeRef);
