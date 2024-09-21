@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -86,6 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail()))
             throw new ApiException("Email already registered");
@@ -100,7 +102,7 @@ public class UserServiceImpl implements UserService {
                         .orElseThrow(() -> new ResourceNotFoundException("role", "name", name))
         ).collect(Collectors.toSet()));
 
-        if (registerRequest.getBirthDate().isAfter(LocalDate.now()))
+        if (Objects.nonNull(registerRequest.getBirthDate()) && registerRequest.getBirthDate().isAfter(LocalDate.now()))
             throw new ApiException("Invalid date of birth");
         user.setBirthDate(registerRequest.getBirthDate());
 
@@ -140,7 +142,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         key.setCreatedTime(LocalDateTime.now());
         keyRepository.save(key);
-        
+
         Mail mail = new ActivateAccountMail(
                 user.getName(),
                 activateAccountUrl.replace("{key}", key.getValue())
