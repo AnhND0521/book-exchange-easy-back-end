@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.util.Objects;
+
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -35,6 +37,7 @@ public class WSConnectionController {
 
     @MessageMapping("/connect")
     public void connect(String token, StompHeaderAccessor headerAccessor) {
+        if (Objects.isNull(token)) return;
         Jwt jwt = jwtDecoder.decode(token);
         Long userId = jwt.getClaim("id");
         String sessionId = headerAccessor.getSessionId();
@@ -44,6 +47,7 @@ public class WSConnectionController {
 
     @MessageMapping("/disconnect")
     public void disconnect(String token) {
+        if (Objects.isNull(token)) return;
         Jwt jwt = jwtDecoder.decode(token);
         Long userId = jwt.getClaim("id");
         onlineUserSet.remove(userId);

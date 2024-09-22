@@ -1,8 +1,7 @@
 package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.community.EventDTO;
+import itss.group22.bookexchangeeasy.dto.community.event.EventDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
-import itss.group22.bookexchangeeasy.dto.statistics.LineChartItem;
 import itss.group22.bookexchangeeasy.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")

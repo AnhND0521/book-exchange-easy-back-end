@@ -1,5 +1,5 @@
 package itss.group22.bookexchangeeasy.service.impl;
-import itss.group22.bookexchangeeasy.dto.community.EventDTO;
+import itss.group22.bookexchangeeasy.dto.community.event.EventDTO;
 import itss.group22.bookexchangeeasy.entity.StoreEvent;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.PostRepository;
@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 @Service
@@ -96,7 +97,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Page<EventDTO> getEventByDate(LocalDate from, LocalDate to, int page, int size) {
-        return eventRepository.findByDateRangeOrderByStartTimeDesc( from, to,PageRequest.of(page, size)).map(this::toDTO);
+        LocalDateTime fromTime = from.atStartOfDay();
+        LocalDateTime toTime = to.plusDays(1).atStartOfDay();
+        return eventRepository.findByDateRangeOrderByStartTimeDesc( fromTime, toTime,PageRequest.of(page, size)).map(this::toDTO);
     }
 
 
@@ -112,6 +115,7 @@ public class EventServiceImpl implements EventService {
         StoreEvent event = mapper.map(eventDTO, StoreEvent.class);
         event.setOwner(userRepository.findById(eventDTO.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", eventDTO.getOwnerId())));
+        event.setImagePath(eventDTO.getImagePath());
         if(eventDTO.getConcernedUserIds() != null) {
             event.setConcernedUsers(eventDTO.getConcernedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toSet()));
         }

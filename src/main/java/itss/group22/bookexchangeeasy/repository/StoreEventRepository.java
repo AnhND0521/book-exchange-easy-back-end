@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Repository
 public interface StoreEventRepository extends JpaRepository<StoreEvent, Long> {
@@ -30,6 +31,6 @@ public interface StoreEventRepository extends JpaRepository<StoreEvent, Long> {
     @Query("SELECT p FROM StoreEvent p " +
             "WHERE p.created >= ?1 AND p.created <= ?2 " +
             "ORDER BY p.created DESC")
-    Page<StoreEvent> findByDateRangeOrderByStartTimeDesc( LocalDate from, LocalDate to,Pageable pageable);
+    Page<StoreEvent> findByDateRangeOrderByStartTimeDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 }
 

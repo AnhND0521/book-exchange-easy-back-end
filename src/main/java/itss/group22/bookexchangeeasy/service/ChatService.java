@@ -1,7 +1,7 @@
 package itss.group22.bookexchangeeasy.service;
 
-import itss.group22.bookexchangeeasy.dto.community.ChatConversationDTO;
-import itss.group22.bookexchangeeasy.dto.community.ChatMessageDTO;
+import itss.group22.bookexchangeeasy.dto.community.chat.ChatConversationDTO;
+import itss.group22.bookexchangeeasy.dto.community.chat.ChatMessageDTO;
 import org.springframework.data.domain.Page;
 
 public interface ChatService {

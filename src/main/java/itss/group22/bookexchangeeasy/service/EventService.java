@@ -1,5 +1,5 @@
 package itss.group22.bookexchangeeasy.service;
-import itss.group22.bookexchangeeasy.dto.community.EventDTO;
+import itss.group22.bookexchangeeasy.dto.community.event.EventDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 

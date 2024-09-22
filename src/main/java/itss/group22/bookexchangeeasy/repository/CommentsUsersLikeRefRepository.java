@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CommentsUsersLikeRefRepository extends JpaRepository<CommentsUsersLikeRef, Long> {
     long countByCommentId(Long commentId);
+    List<CommentsUsersLikeRef> findByCommentId(Long commentId);
     @Modifying
     void deleteAllByCommentId(Long commentId);
     CommentsUsersLikeRef findByCommentIdAndUserId(Long commentId, Long userId);

@@ -1,9 +1,9 @@
 package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
-import itss.group22.bookexchangeeasy.dto.community.PostDTO;
+import itss.group22.bookexchangeeasy.dto.community.post.PostResponse;
+import itss.group22.bookexchangeeasy.dto.community.post.PostDTO;
 import itss.group22.bookexchangeeasy.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +22,14 @@ public class PostController {
 
     @PostMapping("/posts")
     @Operation(summary = "Đăng một bài đăng")
-    public ResponseEntity<PostDTO> postPost(@RequestBody PostDTO postDTO) {
+    public ResponseEntity<PostResponse> postPost(@RequestBody PostDTO postDTO) {
         return ResponseEntity.ok(postService.postPost(postDTO));
     }
     @GetMapping("/posts/latest")
     @Operation(
             summary = "Lấy những bài đăng gần đây nhất (có phân trang)"
     )
-    public ResponseEntity<Page<PostDTO>> getLatestPosts(
+    public ResponseEntity<Page<PostResponse>> getLatestPosts(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
     ) {
@@ -40,7 +40,7 @@ public class PostController {
             summary = "Cập nhật bài đăng",
             description = "Body tương tự đăng sự kiện. Không cần điền các trường id và created."
     )
-    public ResponseEntity<PostDTO> updatePost(@PathVariable Long postId, @RequestBody @Valid PostDTO postDTO) {
+    public ResponseEntity<PostResponse> updatePost(@PathVariable Long postId, @RequestBody @Valid PostDTO postDTO) {
         postService.updatePost(postId, postDTO);
         return ResponseEntity.ok(postService.updatePost(postId, postDTO));
     }
@@ -53,7 +53,7 @@ public class PostController {
     }
     @GetMapping("/posts/find-by-user")
     @Operation(summary = "Lấy danh sách các bài đăng mà một người dùng đăng (có phân trang)")
-    public ResponseEntity<Page<PostDTO>> getPostsByUser(
+    public ResponseEntity<Page<PostResponse>> getPostsByUser(
             @RequestParam(name = "id", required = true) Long userId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "20") int size
@@ -62,7 +62,7 @@ public class PostController {
     }
     @GetMapping("/posts/find-by-event")
     @Operation(summary = "Lấy danh sách các bài đăng thuộc cùng 1 event(có phân trang)")
-    public ResponseEntity<Page<PostDTO>> getPostsByEvent(
+    public ResponseEntity<Page<PostResponse>> getPostsByEvent(
             @RequestParam(name = "id", required = true) Long eventId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "20") int size

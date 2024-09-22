@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +19,8 @@ public class GetCommentResponse {
     private String userPictureUrl;
     private String content;
     private Long likes;
+    private List<Long> likedUserIds;
     private Long replies;
     private LocalDateTime createdAt;
+    private Boolean isEdited;
 }

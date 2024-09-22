@@ -1,5 +1,6 @@
 package itss.group22.bookexchangeeasy.service.impl;
-import itss.group22.bookexchangeeasy.dto.community.PostDTO;
+import itss.group22.bookexchangeeasy.dto.community.post.PostResponse;
+import itss.group22.bookexchangeeasy.dto.community.post.PostDTO;
 import itss.group22.bookexchangeeasy.entity.Post;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.PostRepository;
@@ -7,6 +8,7 @@ import itss.group22.bookexchangeeasy.repository.StoreEventRepository;
 import itss.group22.bookexchangeeasy.repository.UserRepository;
 import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import itss.group22.bookexchangeeasy.service.PostService;
+import itss.group22.bookexchangeeasy.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,23 +27,24 @@ public class PostServiceImpl implements PostService {
     private final StoreEventRepository eventRepository;
     private final PostRepository postRepository;
     private final CloudinaryService cloudinaryService;
+    private final PostMapper postMapper;
+
     @Override
-    public PostDTO postPost(PostDTO postDTO) {
+    public PostResponse postPost(PostDTO postDTO) {
         Post post = toEntity(postDTO);
         post.setId(null);
-
         post.setLikedUsers(null);
         post = postRepository.save(post);
-        return toDTO(post);
+        return postMapper.mapPostToGetPostResponse(post);
     }
 
     @Override
-    public Page<PostDTO> getLatestPosts(int page, int size) {
-        return postRepository.findAllByOrderByCreatedDesc(PageRequest.of(page, size)).map(this::toDTO);
+    public Page<PostResponse> getLatestPosts(int page, int size) {
+        return postRepository.findAllByOrderByCreatedDesc(PageRequest.of(page, size)).map(postMapper::mapPostToGetPostResponse);
     }
 
     @Override
-    public PostDTO updatePost(Long postId, PostDTO postDTO) {
+    public PostResponse updatePost(Long postId, PostDTO postDTO) {
         Post post =postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
         postDTO.setUserId(post.getUser().getId());
@@ -49,7 +52,7 @@ public class PostServiceImpl implements PostService {
         post = toEntity(postDTO);
         post.setId(postId);
         postRepository.save(post);
-        return toDTO(post);
+        return postMapper.mapPostToGetPostResponse(post);
     }
 
     @Override
@@ -62,21 +65,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostDTO> getPostsByUser(Long userId, int page, int size) {
+    public Page<PostResponse> getPostsByUser(Long userId, int page, int size) {
         userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         return postRepository
                 .findByUserOrderByTimestampDesc(userId, PageRequest.of(page, size))
-                .map(this::toDTO);
+                .map(postMapper::mapPostToGetPostResponse);
     }
 
     @Override
-    public Page<PostDTO> getPostsByEvent(Long eventId, int page, int size) {
+    public Page<PostResponse> getPostsByEvent(Long eventId, int page, int size) {
         eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event", "id", eventId));
 
         return postRepository
                 .findByEventOrderByTimestampDesc(eventId, PageRequest.of(page, size))
-                .map(this::toDTO);
+                .map(postMapper::mapPostToGetPostResponse);
     }
 
     @Override
@@ -89,17 +92,6 @@ public class PostServiceImpl implements PostService {
         return data.get("url").toString();
     }
 
-    private PostDTO toDTO(Post post) {
-        PostDTO postDTO = mapper.map(post, PostDTO.class);
-        postDTO.setUserId(post.getUser().getId());
-        if(post.getLikedUsers()!=null){
-            postDTO.setLikedUserIds(post.getLikedUsers().stream().map(user -> user.getId()).collect(Collectors.toSet()));
-        }
-        if(post.getEvent() != null){
-            postDTO.setEventId(post.getEvent().getId());
-        }
-        return postDTO;
-    }
     private Post toEntity(PostDTO postDTO) {
         Post post = mapper.map(postDTO, Post.class);
         post.setUser(userRepository.findById(postDTO.getUserId())

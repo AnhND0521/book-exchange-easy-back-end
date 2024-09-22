@@ -3,9 +3,7 @@ package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
-import itss.group22.bookexchangeeasy.dto.book.TransactionDTO;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
-import itss.group22.bookexchangeeasy.dto.community.EventDTO;
 import itss.group22.bookexchangeeasy.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController

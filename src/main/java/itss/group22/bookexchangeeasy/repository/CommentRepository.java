@@ -12,8 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c " +
             "JOIN CommentsPostsRef cp ON cp.commentId = c.id " +
             "WHERE cp.postId = ?1 " +
-            "ORDER BY c.createdAt ASC")
-    Page<Comment> findByPostIdOrderByCreatedAtAsc(Long postId, Pageable pageable);
+            "ORDER BY c.createdAt DESC")
+    Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable);
 
     @Query("SELECT c FROM Comment c " +
             "JOIN CommentsReplyRef cr ON cr.replyCommentId = c.id " +

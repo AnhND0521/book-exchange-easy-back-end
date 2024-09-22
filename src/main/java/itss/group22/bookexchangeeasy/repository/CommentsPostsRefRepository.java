@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface CommentsPostsRefRepository extends JpaRepository<CommentsPostsRef, Long> {
     @Modifying
     void deleteAllByCommentId(Long commentId);
+
+    long countByPostId(Long postId);
 }

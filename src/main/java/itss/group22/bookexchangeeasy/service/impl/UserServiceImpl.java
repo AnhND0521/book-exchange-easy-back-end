@@ -158,6 +158,8 @@ public class UserServiceImpl implements UserService {
                 .expirationTime(new Date(Instant.now().plus(24, ChronoUnit.HOURS).toEpochMilli()))
                 .claim("id", user.getId())
                 .claim("scope", buildScope(user))
+                .claim("name", user.getName())
+                .claim("pictureUrl", user.getPictureUrl())
                 .build();
         Payload payload = new Payload(claimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);

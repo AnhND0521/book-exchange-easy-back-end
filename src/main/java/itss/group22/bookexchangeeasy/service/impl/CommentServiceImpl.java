@@ -52,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<GetCommentResponse> getCommentsOnPost(Long postId, int page, int size) {
-        Page<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId, PageRequest.of(page, size));
+        Page<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size));
         return comments.map(commentMapper::mapCommentToGetCommentResponse);
     }
 
@@ -61,6 +61,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
         comment.setContent(request.getContent());
+        comment.setIsEdited(true);
         commentRepository.save(comment);
     }
 

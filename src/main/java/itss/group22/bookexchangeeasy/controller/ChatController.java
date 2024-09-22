@@ -2,8 +2,8 @@ package itss.group22.bookexchangeeasy.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
-import itss.group22.bookexchangeeasy.dto.community.ChatConversationDTO;
-import itss.group22.bookexchangeeasy.dto.community.ChatMessageDTO;
+import itss.group22.bookexchangeeasy.dto.community.chat.ChatConversationDTO;
+import itss.group22.bookexchangeeasy.dto.community.chat.ChatMessageDTO;
 import itss.group22.bookexchangeeasy.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

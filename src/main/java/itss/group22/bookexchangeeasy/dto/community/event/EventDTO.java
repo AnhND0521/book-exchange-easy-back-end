@@ -1,4 +1,4 @@
-package itss.group22.bookexchangeeasy.dto.community;
+package itss.group22.bookexchangeeasy.dto.community.event;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +22,5 @@ public class EventDTO {
     private LocalDateTime endTime;
     private LocalDateTime created;
     private Set<Long> concernedUserIds;
+    private String imagePath;
 }
