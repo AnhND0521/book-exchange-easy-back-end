@@ -9,6 +9,7 @@ import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,11 +49,16 @@ public class Initializer {
     private final ExchangeOfferRepository exchangeOfferRepository;
     private final TransactionRepository transactionRepository;
     private final MoneyItemRepository moneyItemRepository;
+    private final StoreEventRepository eventRepository;
+    private final PostRepository postRepository;
     private final RestTemplate restTemplate;
     private final PasswordEncoder passwordEncoder;
     private final TransactionService transactionService;
     private final TaskExecutor taskExecutor;
     private Random random = new Random();
+
+    @Value("${app.user.default-picture-url}")
+    private String defaultPictureUrl;
 
     @Bean
     public CommandLineRunner commandLineRunner() {
@@ -88,6 +94,16 @@ public class Initializer {
                 generateTransactions(30);
                 log.info("Done generating transactions");
             }
+            if (eventRepository.count() == 0) {
+                log.info("Generating events...");
+                generateEvents(15);
+                log.info("Done generating events");
+            }
+            if (postRepository.count() == 0) {
+                log.info("Generating posts...");
+                generatePosts(50);
+                log.info("Done generating posts");
+            }
             log.info("Done preparing data");
         };
     }
@@ -110,6 +126,7 @@ public class Initializer {
                 .name("Admin")
                 .gender(Gender.OTHER)
                 .birthDate(LocalDate.now())
+                .pictureUrl(defaultPictureUrl)
                 .isVerified(true)
                 .isLocked(false)
                 .roles(Set.of(roleRepository.findByName("ADMIN").get()))
@@ -374,6 +391,11 @@ public class Initializer {
                 throw new RuntimeException(e);
             }
         }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void generateExchangeOffers(int number) {
@@ -434,9 +456,124 @@ public class Initializer {
         });
     }
 
+    private void generateEvents(int number) {
+        String baseUrl = "https://baconipsum.com/api/?format=text";
+        List<User> users = userRepository.findAll();
+        CountDownLatch latch = new CountDownLatch(number);
+        for (int i = 0; i < number; i++)
+//            taskExecutor.execute(() ->
+        {
+            String type = random.nextInt(2) == 0 ? "all-meat" : "meat-and-filler";
+
+            String randomSentence = restTemplate.getForEntity(baseUrl + "&type=%s&sentences=%d".formatted(type, 1), String.class).getBody();
+            assert randomSentence != null;
+            List<String> words = Arrays.stream(randomSentence.split("\\s+")).toList();
+            String name = String.join(" ", words.subList(0, random.nextInt(2, 5)));
+
+            String description = restTemplate.getForEntity(baseUrl + "&type=%s&paras=%d".formatted(type, 1), String.class).getBody();
+
+            LocalDateTime from = randomTime(LocalDateTime.now().minusMonths(3), LocalDateTime.now().plusMonths(3));
+            LocalDateTime to = randomTime(from, LocalDateTime.now().plusMonths(3));
+
+            User owner = users.get(random.nextInt(users.size()));
+
+            Set<User> concernedUsers = new HashSet<>();
+            int countConcernedUsers = random.nextInt(users.size() / 2);
+            while (countConcernedUsers-- > 0) {
+                concernedUsers.add(users.get(random.nextInt(users.size())));
+            }
+
+            LocalDateTime created = randomPastTime(3);
+
+            String imagePath = "https://picsum.photos/%d/%d".formatted(800 + random.nextInt(10) - 5, 600 + random.nextInt(10) - 5);
+
+            StoreEvent event = StoreEvent.builder()
+                    .name(name)
+                    .description(description)
+                    .startTime(from)
+                    .endTime(to)
+                    .imagePath(imagePath)
+                    .owner(owner)
+                    .concernedUsers(concernedUsers)
+                    .created(created)
+                    .build();
+
+            eventRepository.save(event);
+            latch.countDown();
+            log.info("Generated event {}/{}: {}", number - latch.getCount(), number, name);
+        }
+//            );
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void generatePosts(int number) {
+        String baseUrl = "https://baconipsum.com/api/?format=text";
+        List<User> users = userRepository.findAll();
+        List<StoreEvent> events = eventRepository.findAll();
+        CountDownLatch latch = new CountDownLatch(number);
+        for (int i = 0; i < number; i++)
+//            taskExecutor.execute(() ->
+        {
+            String type = random.nextInt(2) == 0 ? "all-meat" : "meat-and-filler";
+
+            String randomSentence = restTemplate.getForEntity(baseUrl + "&type=%s&sentences=%d".formatted(type, 1), String.class).getBody();
+            assert randomSentence != null;
+            List<String> words = Arrays.stream(randomSentence.split("\\s+")).toList();
+            String title = String.join(" ", words.subList(0, random.nextInt(2, Math.min(8, words.size()))));
+
+            String content = restTemplate.getForEntity(baseUrl + "&type=%s&paras=%d".formatted(type, random.nextInt(5)), String.class).getBody();
+            if (content.length() > 2000) content = content.substring(0, 1997) + "...";
+
+            User user = users.get(random.nextInt(users.size()));
+
+            Set<User> likedUsers = new HashSet<>();
+            int countLikedUsers = random.nextInt(users.size() * 2 / 3);
+            while (countLikedUsers-- > 0) {
+                likedUsers.add(users.get(random.nextInt(users.size())));
+            }
+
+            LocalDateTime created = randomPastTime(3);
+            LocalDateTime lastUpdated = randomTime(created, LocalDateTime.now());
+
+            String imagePath = "https://picsum.photos/%d/%d".formatted(800 + random.nextInt(10) - 5, 600 + random.nextInt(10) - 5);
+
+            StoreEvent event = random.nextInt(2) == 0 ? null : events.get(random.nextInt(events.size()));
+
+            Post post = Post.builder()
+                    .title(title)
+                    .content(content)
+                    .imagePath(imagePath)
+                    .user(user)
+                    .created(created)
+                    .lastUpdated(lastUpdated)
+                    .event(event)
+                    .likedUsers(likedUsers)
+                    .build();
+            postRepository.save(post);
+            latch.countDown();
+            log.info("Generated post {}/{}: {}", number - latch.getCount(), number, title);
+        }
+//        );
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private LocalDateTime randomPastTime(int monthsBefore) {
-        long minEpoch = LocalDateTime.now().minusMonths(monthsBefore).toEpochSecond(ZoneOffset.UTC) * 1000;
-        long maxEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000;  // Current time
+        return randomTime(LocalDateTime.now().minusMonths(monthsBefore), LocalDateTime.now());
+    }
+
+    private LocalDateTime randomTime(LocalDateTime from, LocalDateTime to) {
+        long minEpoch = from.toEpochSecond(ZoneOffset.UTC) * 1000;
+        long maxEpoch = to.toEpochSecond(ZoneOffset.UTC) * 1000;
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(random.nextLong(minEpoch, maxEpoch)), ZoneOffset.UTC);
     }
 }

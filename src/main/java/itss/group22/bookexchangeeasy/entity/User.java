@@ -54,6 +54,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Role> roles;
 
     private LocalDateTime created;

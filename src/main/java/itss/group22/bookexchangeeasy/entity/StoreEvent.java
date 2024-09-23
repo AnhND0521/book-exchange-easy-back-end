@@ -34,7 +34,6 @@ public class StoreEvent {
 
     private LocalDateTime endTime;
 
-    @CreationTimestamp
     private LocalDateTime created;
 
     @ManyToMany
@@ -45,4 +44,9 @@ public class StoreEvent {
     )
     private Set<User> concernedUsers;
     private String imagePath;
+
+    @PrePersist
+    public void prePersist() {
+        if (created == null) created = LocalDateTime.now();
+    }
 }

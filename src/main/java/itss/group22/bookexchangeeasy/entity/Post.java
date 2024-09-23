@@ -28,6 +28,7 @@ public class Post {
 
     private String title;
 
+    @Column(name = "content", length = 2000)
     private String content;
 
     private String imagePath;
@@ -44,9 +45,13 @@ public class Post {
     @JoinColumn(name = "event_id")
     private StoreEvent event;
 
-    @CreationTimestamp
     private LocalDateTime created;
 
     @UpdateTimestamp
     private LocalDateTime lastUpdated;
+
+    @PrePersist
+    public void prePersist() {
+        if (created == null) created = LocalDateTime.now();
+    }
 }
