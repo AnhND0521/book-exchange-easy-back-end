@@ -65,6 +65,9 @@ public class UserServiceImpl implements UserService {
     @Value("${app.web.url.activate-account}")
     private String activateAccountUrl;
 
+    @Value("${app.user.default-picture-url}")
+    private String defaultPictureUrl;
+
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) {
         User user = userRepository.findByEmail(authRequest.getEmail())
@@ -101,6 +104,7 @@ public class UserServiceImpl implements UserService {
                 roleRepository.findByName(name)
                         .orElseThrow(() -> new ResourceNotFoundException("role", "name", name))
         ).collect(Collectors.toSet()));
+        user.setPictureUrl(defaultPictureUrl);
 
         if (Objects.nonNull(registerRequest.getBirthDate()) && registerRequest.getBirthDate().isAfter(LocalDate.now()))
             throw new ApiException("Invalid date of birth");

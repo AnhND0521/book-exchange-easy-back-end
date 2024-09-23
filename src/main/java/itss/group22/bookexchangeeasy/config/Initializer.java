@@ -9,8 +9,6 @@ import itss.group22.bookexchangeeasy.repository.*;
 import itss.group22.bookexchangeeasy.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,22 +18,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Configuration
 @RequiredArgsConstructor
@@ -72,16 +69,13 @@ public class Initializer {
             if (userRepository.count() == 0) {
 //                importSql("data/user_info.sql", "data/role.sql", "data/users_roles.sql");
                 log.info("Generating users...");
-                generateUsers(20);
+                generateUsers(50);
                 log.info("Done generating users");
-            }
-            if (categoryRepository.count() == 0) {
-                generateCategories();
             }
             if (bookRepository.count() == 0) {
 //                importSql("data/book.sql", "data/money_item.sql", "data/exchange_request.sql");
                 log.info("Generating books...");
-                generateBooks(100);
+                generateBooks(20);
                 log.info("Done generating books");
             }
             if (exchangeOfferRepository.count() == 0) {
@@ -181,82 +175,204 @@ public class Initializer {
         }
     }
 
-    private void generateCategories() {
-        List<String> categories = List.of("Romance", "Fantasy", "Horror", "History", "Classics", "Biography", "Mystery", "Science fiction", "Adventure", "Thriller", "Short story", "Historical fiction", "Children's literature", "Young adult");
-        categoryRepository.saveAll(categories.stream().map(name -> Category.builder().name(name).build()).toList());
-    }
+    @Transactional
+    private void generateBooks(int numberPerCategory) {
+        String baseUrl = "https://openlibrary.org";
+        String coverBaseUrl = "https://covers.openlibrary.org/b/id/";
+        List<String> subjects = List.of(
+                "Fantasy",
+                "Historical Fiction",
+                "Horror",
+                "Humor",
+                "Literature",
+                "Magic",
+                "Mystery and detective stories",
+                "Plays",
+                "Poetry",
+                "Romance",
+                "Science Fiction",
+                "Short Stories",
+                "Thriller",
+                "Young Adult",
+                "Biology",
+                "Chemistry",
+                "Mathematics",
+                "Physics",
+                "Programming",
+                "Management",
+                "Entrepreneurship",
+                "Business Economics",
+                "Business Success",
+                "Finance",
+                "Ancient Civilization",
+                "Archaeology",
+                "Anthropology",
+                "World War II",
+                "Social Life and Customs",
+                "Anthropology",
+                "Religion",
+                "Political Science",
+                "Psychology"
+        );
 
-    @Async
-    private void generateBooks(int number) {
-        String rootUrl = "https://openlibrary.org";
+        List<User> users = userRepository.findAll();
 
-        try {
-            ResponseEntity<String> response = restTemplate.getForEntity(rootUrl + "/search.json?q=artificial+intelligence&limit=" + number, String.class);
-            JsonNode root = null;
-            root = new ObjectMapper().readTree(response.getBody());
+        int latchCount = numberPerCategory * subjects.size();
+        CountDownLatch latch = new CountDownLatch(latchCount);
 
-            var allCategories = categoryRepository.findAll();
-            var allUsers = userRepository.findAll();
+        for (String subject : subjects) {
+            log.info("Generating category: {}", subject);
+            Category category = categoryRepository.findByName(subject).orElse(null);
+            if (Objects.isNull(category)) {
+                category = Category.builder().name(subject).build();
+                categoryRepository.save(category);
+            }
+            final Category thisCategory = category;
+            try {
+                String url = baseUrl + "/subjects/" + subject.toLowerCase().replaceAll("\\s+", "_") + ".json?limit=" + numberPerCategory;
+                log.info("Fetching url: {}", url);
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+                JsonNode root = new ObjectMapper().readTree(response.getBody());
 
-//            int count = 0;
-            CountDownLatch latch = new CountDownLatch(number);
-            for (var node : root.get("docs"))
-                taskExecutor.execute(() -> {
-                    String title = node.get("title").asText();
-                    String author = node.get("author_name") == null ? null : node.get("author_name").get(0).asText();
-                    String publisher = node.get("publisher") == null ? null : node.get("publisher").get(random.nextInt(0, node.get("publisher").size())).asText();
-                    Integer publishYear = node.get("publish_year") == null ? null : node.get("publish_year").get(random.nextInt(0, node.get("publish_year").size())).asInt();
-                    String language = node.get("language") == null ? null : node.get("language").get(random.nextInt(0, node.get("language").size())).asText();
-                    Integer pages = node.get("number_of_pages_median") == null ? null : node.get("number_of_pages_median").asInt();
-                    String layout = List.of("Softcover", "Hardcover").get(random.nextInt(2));
-                    String description = node.get("first_sentence") == null ? null : node.get("first_sentence").get(random.nextInt(node.get("first_sentence").size())).asText();
+                var works = root.get("works");
 
-                    // get cover image
-                    String imagePath = null;
-                    try {
-                        String bookUrl = rootUrl + node.get("seed").get(0).asText();
-                        Document doc = Jsoup.connect(bookUrl).userAgent("Jsoup client").get();
-                        var imageNode = doc.selectFirst("div[class~=cover] img");
-                        if (imageNode != null) {
-                            imagePath = imageNode.attr("src");
-                            if (imagePath.startsWith("//")) imagePath = "https:" + imagePath;
-                            if (imagePath.endsWith("avatar_book.png")) imagePath = null;
+                for (var work : works)
+                    taskExecutor.execute(() -> {
+                        try {
+                            Book book;
+                            if (bookRepository.findByTitle(work.get("title").asText()).isPresent()) {
+                                return;
+                            }
+
+                            book = new Book();
+
+                            // Title
+                            book.setTitle(work.get("title").asText());
+
+                            // Author
+                            var authors = work.get("authors");
+                            StringBuilder authorNames = new StringBuilder();
+                            for (var author : authors) {
+                                if (!authorNames.isEmpty())
+                                    authorNames.append(", ");
+                                authorNames.append(author.get("name").asText());
+                            }
+                            book.setAuthor(authorNames.toString());
+
+                            String apiUrl = baseUrl + work.get("key").asText() + ".json";
+                            log.info("Fetching url: {}", apiUrl);
+                            ResponseEntity<String> workResponse = restTemplate.getForEntity(apiUrl, String.class);
+                            JsonNode workRoot = new ObjectMapper().readTree(workResponse.getBody());
+
+                            // Description
+                            if (Objects.nonNull(workRoot.get("description")) && !workRoot.get("description").isNull()) {
+                                String description = workRoot.get("description").asText();
+                                if (description.length() > 1000)
+                                    description = description.substring(0, 997) + "...";
+                                book.setDescription(description);
+                            }
+
+                            // Layout
+                            if (random.nextInt(2) == 1)
+                                book.setLayout(List.of("Softcover", "Hardcover").get(random.nextInt(2)));
+
+                            // Image path
+                            if (!work.get("cover_id").isNull()) {
+                                book.setImagePath(coverBaseUrl + work.get("cover_id").asText() + "-L.jpg");
+                            }
+
+                            // Category
+                            book.setCategories(List.of(thisCategory));
+
+                            // Status
+                            book.setStatus(BookStatus.AVAILABLE);
+
+                            // Owner
+                            book.setOwner(users.get(random.nextInt(users.size())));
+
+                            // Created
+                            book.setCreated(randomPastTime(3));
+
+                            // Concerned users
+                            List<User> concernedUsers = new ArrayList<>();
+                            int countConcernedUsers = random.nextInt(5);
+                            while (countConcernedUsers-- > 0) {
+                                concernedUsers.add(users.get(random.nextInt(users.size())));
+                            }
+                            book.setConcernedUsers(concernedUsers);
+
+                            String editionKey = null;
+                            if (!work.get("cover_edition_key").isNull()) {
+                                editionKey = work.get("cover_edition_key").asText();
+                            } else if (!work.get("lending_edition").isNull()) {
+                                editionKey = work.get("lending_edition").asText();
+                            } else if (!work.get("availability").isNull() && !work.get("availability").get("openlibrary_edition").isNull()) {
+                                editionKey = work.get("availability").get("openlibrary_edition").asText();
+                            } else {
+                                bookRepository.save(book);
+
+                                latch.countDown();
+                                log.info(
+                                        "Generated book #{}: '{}'",
+                                        latchCount - latch.getCount() + 1,
+                                        book.getTitle()
+                                );
+
+                                return;
+                            }
+
+                            apiUrl = baseUrl + "/books/" + editionKey + ".json";
+                            log.info("Fetching url: {}", apiUrl);
+                            ResponseEntity<String> editionResponse = restTemplate.getForEntity(apiUrl, String.class);
+                            JsonNode editionRoot = new ObjectMapper().readTree(editionResponse.getBody());
+
+                            // Publisher
+                            if (Objects.nonNull(editionRoot.get("publishers")) && !editionRoot.get("publishers").isNull() && !editionRoot.get("publishers").isEmpty()) {
+                                book.setPublisher(editionRoot.get("publishers").get(0).asText());
+                            }
+
+                            // Publish year
+                            if (Objects.nonNull(editionRoot.get("publish_date")) && !editionRoot.get("publish_date").isNull()) {
+                                String regex = "\\d{4}";
+
+                                Pattern pattern = Pattern.compile(regex);
+                                Matcher matcher = pattern.matcher(editionRoot.get("publish_date").asText());
+
+                                while (matcher.find()) {
+                                    String year = matcher.group();
+                                    book.setPublishYear(Integer.valueOf(year));
+                                }
+                            }
+
+                            // Language
+                            if (Objects.nonNull(editionRoot.get("languages")) && !editionRoot.get("languages").isNull() && !editionRoot.get("languages").isEmpty()) {
+                                String languageKey = editionRoot.get("languages").get(0).get("key").asText();
+                                String language = languageKey.substring(languageKey.lastIndexOf('/') + 1);
+                                book.setLanguage(language);
+                            }
+
+                            // Number of pages
+                            if (Objects.nonNull(editionRoot.get("number_of_pages")) && !editionRoot.get("number_of_pages").isNull()) {
+                                book.setPages(editionRoot.get("number_of_pages").asInt());
+                            }
+
+                            bookRepository.save(book);
+
+                            latch.countDown();
+                            log.info(
+                                    "Generated book #{}: '{}'",
+                                    latchCount - latch.getCount() + 1,
+                                    book.getTitle()
+                            );
+
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    });
 
-                    List<Category> categories = IntStream.range(0, random.nextInt(1, 6))
-                            .mapToObj(allCategories::get)
-                            .collect(Collectors.toSet())
-                            .stream().toList();
-
-                    BookStatus status = BookStatus.AVAILABLE;
-                    User owner = allUsers.get(random.nextInt(allUsers.size()));
-                    List<User> concernUser = new ArrayList<>();
-                    while (concernUser.size() < 10) {
-                        int randomIndex = random.nextInt(allUsers.size());
-                        User randomUser = allUsers.get(randomIndex);
-
-                        if (!concernUser.contains(randomUser)) {
-                            concernUser.add(randomUser);
-                        }
-                    }
-
-                    var created = randomPastTime(2);
-
-                    bookRepository.save(new Book(null, title, author, publisher, publishYear,
-                            language, null, null, pages, layout, description,
-                            imagePath, categories, status, owner, created,concernUser));
-                    log.info("Generated book %d/%d: %s".formatted(number - latch.getCount() + 1, number, title));
-                    latch.countDown();
-//                count++;
-//                if (count % 10 == 0) log.info(count + "/" + number);
-                });
-
-            latch.await();
-        } catch (JsonProcessingException | InterruptedException e) {
-            throw new RuntimeException(e);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

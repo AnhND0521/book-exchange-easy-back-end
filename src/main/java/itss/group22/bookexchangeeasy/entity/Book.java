@@ -21,6 +21,7 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Column(name = "author", length = 500)
     private String author;
     private String publisher;
     private Integer publishYear;

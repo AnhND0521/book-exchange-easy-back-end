@@ -1,6 +1,5 @@
 package itss.group22.bookexchangeeasy.repository;
 import itss.group22.bookexchangeeasy.entity.Book;
-import itss.group22.bookexchangeeasy.entity.StoreEvent;
 import itss.group22.bookexchangeeasy.enums.BookStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findByStatusOrderByCreatedDesc(BookStatus bookStatus, Pageable pageable);
@@ -48,4 +48,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "WHERE u.id = ?1 " +           // Filter by user ID
             "ORDER BY b.created DESC")
     Page<Book> findByConcernedUsersOrderByStartTimeDesc(Long userId, Pageable pageable);
+
+    Optional<Book> findByTitle(String title);
 }
