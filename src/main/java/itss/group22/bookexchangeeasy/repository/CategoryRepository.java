@@ -21,4 +21,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "ORDER BY bookCount DESC " +
             "LIMIT ?1")
     List<Object[]> findTopBookCategoriesWithBookStatus(int limit, BookStatus status);
+
+    @Query("SELECT c FROM Category c ORDER BY RAND() LIMIT ?1")
+    List<Category> findRandom(int limit);
 }

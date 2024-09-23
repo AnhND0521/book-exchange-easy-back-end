@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -129,24 +130,40 @@ public class BookServiceImpl implements BookService {
                 .stream()
                 .map(result -> {
                     Category category = (Category) result[0];
-                    Page<Book> books = bookRepository.findByCategoryIdAndStatus(category.getId(), BookStatus.AVAILABLE, PageRequest.of(0, booksPerCategory));
+                    List<Book> books = bookRepository.findRandomByCategoryIdAndStatus(category.getId(), BookStatus.AVAILABLE, booksPerCategory);
                     return CategoryDTO.builder()
                             .id(category.getId())
                             .categoryName(category.getName())
-                            .books(books.map(this::toDTO).toList())
+                            .books(books.stream().map(this::toDTO).toList())
+                            .build();
+                }).toList();
+    }
+
+    @Override
+    public List<CategoryDTO> listByCategoriesV2(Integer categories, Integer booksPerCategory) {
+        List<Category> categoryList = categoryRepository.findAll();
+        Collections.shuffle(categoryList);
+        return categoryList.subList(0, categories)
+                .stream()
+                .map(category -> {
+                    List<Book> books = bookRepository.findRandomByCategoryIdAndStatus(category.getId(), BookStatus.AVAILABLE, booksPerCategory);
+                    return CategoryDTO.builder()
+                            .id(category.getId())
+                            .categoryName(category.getName())
+                            .books(books.stream().map(this::toDTO).toList())
                             .build();
                 }).toList();
     }
 
     @Override
     public Page<BookDTO> searchBookSortByAuthor(String keyword, int page, int size) {
-        Page<Book> books = bookRepository.findByAuthorDESC(keyword,BookStatus.AVAILABLE ,PageRequest.of(page, size));
+        Page<Book> books = bookRepository.findByAuthorDESC(keyword, BookStatus.AVAILABLE, PageRequest.of(page, size));
         return books.map(this::toDTO);
     }
 
     @Override
     public Page<BookDTO> searchBookSortByTitle(String keyword, int page, int size) {
-        Page<Book> books = bookRepository.findByTitleDesc(keyword,BookStatus.AVAILABLE ,PageRequest.of(page, size));
+        Page<Book> books = bookRepository.findByTitleDesc(keyword, BookStatus.AVAILABLE, PageRequest.of(page, size));
         return books.map(this::toDTO);
     }
 
@@ -159,7 +176,7 @@ public class BookServiceImpl implements BookService {
     public String uploadBookImage(Long id, MultipartFile imageFile) throws IOException {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "id", id));
-        Map data =  cloudinaryService.uploadFile(imageFile);
+        Map data = cloudinaryService.uploadFile(imageFile);
         book.setImagePath(data.get("url").toString());
         bookRepository.save(book);
         return data.get("url").toString();
@@ -185,7 +202,7 @@ public class BookServiceImpl implements BookService {
                     }).toList();
             book.setCategories(categories);
         }
-        if(bookDTO.getConcernedUserIds() != null) {
+        if (bookDTO.getConcernedUserIds() != null) {
             book.setConcernedUsers(bookDTO.getConcernedUserIds().stream().map(userId -> userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId))).collect(Collectors.toList()));
         }
 
@@ -197,7 +214,7 @@ public class BookServiceImpl implements BookService {
         dto.setOwnerId(book.getOwner().getId());
         dto.setStatus(book.getStatus().name());
         dto.setCategories(book.getCategories().stream().map(Category::getName).toList());
-        if(book.getConcernedUsers() != null){
+        if (book.getConcernedUsers() != null) {
             dto.setConcernedUserIds(book.getConcernedUsers().stream().map(User::getId).collect(Collectors.toSet()));
         }
         return dto;

@@ -20,6 +20,7 @@ public interface BookService {
     Long getExchangedBooks(LocalDateTime fromDate, LocalDateTime toDate);
     Page<BookDTO> getBooksByUser(Long userId, int page, int size);
     List<CategoryDTO> listByCategories(Integer categories, Integer booksPerCategory);
+    List<CategoryDTO> listByCategoriesV2(Integer categories, Integer booksPerCategory);
 
     Page<BookDTO> searchBookSortByAuthor(String keyword,int page,int size);
     Page<BookDTO> searchBookSortByTitle(String keyword,int page,int size);

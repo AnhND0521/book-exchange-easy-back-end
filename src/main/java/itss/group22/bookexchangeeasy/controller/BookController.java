@@ -130,7 +130,7 @@ public class BookController {
             @RequestParam(name = "categories", required = false, defaultValue = "5") Integer categories,
             @RequestParam(name = "books-per-category", required = false, defaultValue = "20") Integer booksPerCategories
     ) {
-        return ResponseEntity.ok(bookService.listByCategories(categories, booksPerCategories));
+        return ResponseEntity.ok(bookService.listByCategoriesV2(categories, booksPerCategories));
     }
 
     @PostMapping("/books/{id}/upload-image-book")

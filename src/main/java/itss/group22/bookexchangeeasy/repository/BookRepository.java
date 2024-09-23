@@ -39,9 +39,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findByOwnerIdOrderByCreatedDesc(Long ownerId, Pageable pageable);
 
-    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = ?1 AND b.status = ?2 ORDER BY RAND()")
-    Page<Book> findByCategoryIdAndStatus(Long categoryId, BookStatus status, Pageable pageable);
-
 
     @Query("SELECT b FROM Book b " +
             "JOIN b.concernedUsers u " +  // Join with concernedUsers table
@@ -50,4 +47,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findByConcernedUsersOrderByStartTimeDesc(Long userId, Pageable pageable);
 
     Optional<Book> findByTitle(String title);
+
+    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = ?1 AND b.status = ?2 ORDER BY RAND() LIMIT ?3")
+    List<Book> findRandomByCategoryIdAndStatus(Long categoryId, BookStatus status, int limit);
 }
