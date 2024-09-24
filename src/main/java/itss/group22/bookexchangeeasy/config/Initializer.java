@@ -51,6 +51,10 @@ public class Initializer {
     private final MoneyItemRepository moneyItemRepository;
     private final StoreEventRepository eventRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final CommentsPostsRefRepository commentsPostsRefRepository;
+    private final CommentsUsersLikeRefRepository commentsUsersLikeRefRepository;
+    private final CommentsReplyRefRepository commentsReplyRefRepository;
     private final RestTemplate restTemplate;
     private final PasswordEncoder passwordEncoder;
     private final TransactionService transactionService;
@@ -103,6 +107,11 @@ public class Initializer {
                 log.info("Generating posts...");
                 generatePosts(50);
                 log.info("Done generating posts");
+            }
+            if (commentRepository.count() == 0) {
+                log.info("Generating comments...");
+                generateComments(200);
+                log.info("Done generating comments");
             }
             log.info("Done preparing data");
         };
@@ -560,6 +569,76 @@ public class Initializer {
         }
 //        );
 
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void generateComments(int number) {
+        String baseUrl = "https://baconipsum.com/api/?format=text";
+        List<User> users = userRepository.findAll();
+        List<Post> posts = postRepository.findAll();
+        CountDownLatch latch = new CountDownLatch(number);
+        for (int i = 0; i < number; i++) {
+            String type = random.nextInt(2) == 0 ? "all-meat" : "meat-and-filler";
+
+            String content = restTemplate.getForEntity(baseUrl + "&type=%s&sentences=%d".formatted(type, random.nextInt(1, 3)), String.class).getBody();
+
+            User user = users.get(random.nextInt(users.size()));
+
+            LocalDateTime createdAt = randomPastTime(3);
+
+            boolean isEdited = random.nextBoolean();
+
+            Comment comment = Comment.builder()
+                    .userId(user.getId())
+                    .content(content)
+                    .createdAt(createdAt)
+                    .isEdited(isEdited)
+                    .build();
+            commentRepository.save(comment);
+            assert comment.getId() != null;
+
+            // Generate likes
+            int countLikedUsers = random.nextInt(users.size() / 3);
+            Set<Long> likedUserIds = new HashSet<>();
+            while (countLikedUsers-- > 0) {
+                Long userId = users.get(random.nextInt(users.size())).getId();
+                if (likedUserIds.contains(userId))
+                    continue;
+
+                likedUserIds.add(userId);
+                CommentsUsersLikeRef commentsUsersLikeRef = CommentsUsersLikeRef.builder()
+                        .commentId(comment.getId())
+                        .userId(userId)
+                        .build();
+                commentsUsersLikeRefRepository.save(commentsUsersLikeRef);
+            }
+
+            // Set parent post or comment
+            boolean isCommentOnPost = random.nextBoolean();
+            if (isCommentOnPost) {
+                Long postId = posts.get(random.nextInt(posts.size())).getId();
+                CommentsPostsRef commentsPostsRef = CommentsPostsRef.builder()
+                        .commentId(comment.getId())
+                        .postId(postId)
+                        .build();
+                commentsPostsRefRepository.save(commentsPostsRef);
+            } else {
+                List<Comment> comments = commentRepository.findAll();
+                Long baseCommentId = comments.get(random.nextInt(comments.size())).getId();
+                CommentsReplyRef commentsReplyRef = CommentsReplyRef.builder()
+                        .baseCommentId(baseCommentId)
+                        .replyCommentId(comment.getId())
+                        .build();
+                commentsReplyRefRepository.save(commentsReplyRef);
+            }
+
+            latch.countDown();
+            log.info("Generated comment {}/{}: {}", number - latch.getCount(), number, content);
+        }
         try {
             latch.await();
         } catch (InterruptedException e) {

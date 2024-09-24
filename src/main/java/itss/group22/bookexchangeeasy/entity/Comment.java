@@ -24,9 +24,13 @@ public class Comment {
 
     private String content;
 
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Builder.Default
     private Boolean isEdited = Boolean.FALSE;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+    }
 }
