@@ -3,11 +3,13 @@ package itss.group22.bookexchangeeasy.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
+import itss.group22.bookexchangeeasy.dto.book.FilterBooksRequest;
 import itss.group22.bookexchangeeasy.dto.common.ResponseMessage;
 import itss.group22.bookexchangeeasy.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -139,4 +141,25 @@ public class BookController {
         return ResponseEntity.ok(new ResponseMessage(bookService.uploadBookImage(id, imageFile)));
     }
 
+    @GetMapping("/books/filter")
+    @Operation(summary = "Lọc danh sách sách")
+    private ResponseEntity<Page<BookDTO>> filterBooks(
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "author", required = false) String author,
+            @RequestParam(name = "publisher", required = false) String publisher,
+            @RequestParam(name = "owner-id", required = false) Long ownerId,
+            @RequestParam(name = "category-id", required = false) Long categoryId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "50") int size
+    ) {
+        FilterBooksRequest request = FilterBooksRequest.builder()
+                .title(title)
+                .author(author)
+                .publisher(publisher)
+                .ownerId(ownerId)
+                .categoryId(categoryId)
+                .pageable(PageRequest.of(page, size))
+                .build();
+        return ResponseEntity.ok(bookService.filterBooks(request));
+    }
 }

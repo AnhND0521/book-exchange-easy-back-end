@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.service;
 
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
+import itss.group22.bookexchangeeasy.dto.book.FilterBooksRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,4 +27,5 @@ public interface BookService {
     Page<BookDTO> searchBookSortByTitle(String keyword,int page,int size);
     Page<BookDTO> getBooksByConcernedUser(Long userId, int page, int size);
     String uploadBookImage(Long id, MultipartFile imageFile) throws IOException;
+    Page<BookDTO> filterBooks(FilterBooksRequest request);
 }

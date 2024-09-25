@@ -2,6 +2,7 @@ package itss.group22.bookexchangeeasy.service.impl;
 
 import itss.group22.bookexchangeeasy.dto.book.BookDTO;
 import itss.group22.bookexchangeeasy.dto.book.CategoryDTO;
+import itss.group22.bookexchangeeasy.dto.book.FilterBooksRequest;
 import itss.group22.bookexchangeeasy.entity.Book;
 import itss.group22.bookexchangeeasy.entity.Category;
 import itss.group22.bookexchangeeasy.entity.User;
@@ -9,6 +10,9 @@ import itss.group22.bookexchangeeasy.enums.BookStatus;
 import itss.group22.bookexchangeeasy.exception.ApiException;
 import itss.group22.bookexchangeeasy.exception.ResourceNotFoundException;
 import itss.group22.bookexchangeeasy.repository.*;
+import itss.group22.bookexchangeeasy.repository.specification.QueryOperator;
+import itss.group22.bookexchangeeasy.repository.specification.SpecificationBuilder;
+import itss.group22.bookexchangeeasy.repository.specification.SpecificationFilter;
 import itss.group22.bookexchangeeasy.service.BookService;
 import itss.group22.bookexchangeeasy.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -180,6 +181,18 @@ public class BookServiceImpl implements BookService {
         book.setImagePath(data.get("url").toString());
         bookRepository.save(book);
         return data.get("url").toString();
+    }
+
+    @Override
+    public Page<BookDTO> filterBooks(FilterBooksRequest request) {
+        return bookRepository.findByTitleOrAuthorOrPublisherOrOwnerIdOrCategoryId(
+                request.getTitle(),
+                request.getAuthor(),
+                request.getPublisher(),
+                request.getOwnerId(),
+                request.getCategoryId(),
+                request.getPageable()
+        ).map(this::toDTO);
     }
 
     private Book toEntity(BookDTO bookDTO) {

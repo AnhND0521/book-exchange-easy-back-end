@@ -4,12 +4,13 @@ import itss.group22.bookexchangeeasy.enums.BookStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookRepository extends JpaRepository<Book, Long> {
+public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     Page<Book> findByStatusOrderByCreatedDesc(BookStatus bookStatus, Pageable pageable);
 
     List<Book> findAllByOrderByCreatedDesc(Pageable pageable);
@@ -50,4 +51,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = ?1 AND b.status = ?2 ORDER BY RAND() LIMIT ?3")
     List<Book> findRandomByCategoryIdAndStatus(Long categoryId, BookStatus status, int limit);
+
+    @Query("SELECT b FROM Book b JOIN b.owner o JOIN b.categories c " +
+            "WHERE (?1 IS NULL OR b.title LIKE LOWER(CONCAT('%', ?1, '%'))) " +
+            "AND (?2 IS NULL OR b.author LIKE LOWER(CONCAT('%', ?2, '%'))) " +
+            "AND (?3 IS NULL OR b.publisher LIKE LOWER(CONCAT('%', ?3, '%'))) " +
+            "AND (?4 IS NULL OR o.id = ?4) " +
+            "AND (?5 IS NULL OR c.id = ?5)")
+    Page<Book> findByTitleOrAuthorOrPublisherOrOwnerIdOrCategoryId(String title, String author, String publisher, Long ownerId, Long categoryId, Pageable pageable);
 }
